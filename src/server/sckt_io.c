@@ -155,14 +155,16 @@ void StartScktReception()
   addr.sin_port = htons(DEFAULT_PORT);
 
   // Bind
-  if (bind(serv_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+  if(bind(serv_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+  {
     Log(Err, "Failed to bind server with address !!");
     perror("bind failed");
     exit(EXIT_FAILURE);
   }
 
   // Listen
-  if (listen(serv_fd, 3) < 0) {
+  if(listen(serv_fd, 3) < 0)
+  {
     Log(Err, "Faied to listen to socket !!");
     perror("listen");
     exit(EXIT_FAILURE);
@@ -170,7 +172,8 @@ void StartScktReception()
 
   // Accept a connection
   sckt = accept(serv_fd, (struct sockaddr *)&addr, (socklen_t *)&addrlen);
-  if (sckt < 0) {
+  if(sckt < 0)
+  {
     Log(Err, "Failed to accept connection !!");
     perror("accept");
     exit(EXIT_FAILURE);

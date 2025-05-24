@@ -28,9 +28,11 @@ pid_t CheckRuningProc(const char * procName)
 	{
 		proc_t *proc;
 
-		while ((proc = readproc(procTable, NULL)) != NULL) {
+		while((proc = readproc(procTable, NULL)) != NULL)
+		{
 			// printf("Runing proc: %s\n", proc -> cmd);
-      if (strstr(proc->cmd, procName)) {
+      if(strstr(proc->cmd, procName))
+      {
         Log(Info, "Process '%s' is running (PID: %d)\n", procName, proc->tid);
         return proc -> tid;
         // freeproc(proc);

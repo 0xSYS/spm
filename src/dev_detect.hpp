@@ -9,7 +9,6 @@
 class SPMDetect
 {
 	public:
-	// sdfsdf
-	std::vector<std::string> CreateIP_Table();
-	//bool IsDeviceActive(std::string ip);
+	  static std::vector<std::string> CreateIP_Table();
+	  //bool IsDeviceActive(std::string ip);
 };

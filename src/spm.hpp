@@ -10,19 +10,22 @@
 
 
 
+
+
+
+inline SPMConfig::cfgStruct globalConf;
+
 class SPM
 {
 	public:
-
-		
-  SPMConfig::cfgStruct globalConf;
+	
   std::vector<SPMList::computer> mainList; // Store the main list at first run
 
   
-	void Init();
-	void SaveCustomLogFile(std::string f); // To do
-	void LoadCustomDevList(std::string f);
-	void SaveCustomDevList(std::string f);
-	void ReloadDevList();
-	void Terminate();
+	static void Init();
+	static void SaveCustomLogFile(std::string f); // To do
+	static void LoadCustomDevList(std::string f);
+	static void SaveCustomDevList(std::string f);
+	static void ReloadDevList();
+	static void Terminate();
 };

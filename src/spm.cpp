@@ -34,7 +34,7 @@ Main Source file of SPM library
 
 
 // SPMUtils spmUtils; // Moved to globals.hpp
-SPMConfig spmConf;
+//SPMConfig spmConf;
 SPMList spmLst;
 
 
@@ -52,7 +52,7 @@ void SPM::Init()
   SPMConfig::cfgStruct defaultConfig;
 
 #if defined(_WIN32) || defined(_WIN64)
-  spmUtils.SetWinTerm();
+  SPMUtils::SetWinTerm();
 #endif
 
   // Basic Logging test to stdout
@@ -69,9 +69,9 @@ void SPM::Init()
   mainDir << SPMUtils::GetHomeDir() << "/.spm";
 
   SPM_LOG(SPMDebug::Info, "Checking for '.spm' directory");
-  if(spmUtils.checkDir(mainDir.str()) == false)
+  if(SPMUtils::checkDir(mainDir.str()) == false)
   {
-    spmUtils.makeDir(mainDir.str());
+    SPMUtils::makeDir(mainDir.str());
     SPM_LOG(SPMDebug::Info, "'.spm' directory created");
   }
   else
@@ -82,9 +82,9 @@ void SPM::Init()
   mainDir << "/lists";
 
   SPM_LOG(SPMDebug::Info, "Checking for '.spm/lists' directory...");
-  if(spmUtils.checkDir(mainDir.str()) == false)
+  if(SPMUtils::checkDir(mainDir.str()) == false)
   {
-    spmUtils.makeDir(mainDir.str());
+    SPMUtils::makeDir(mainDir.str());
   }
   else
   {
@@ -99,10 +99,10 @@ void SPM::Init()
   mainDir << SPMUtils::GetHomeDir() << "/.spm/logs";
 
   SPM_LOG(SPMDebug::Info, "Checking for '.spm/logs' directory");
-  if(spmUtils.checkDir(mainDir.str()) == false)
+  if(SPMUtils::checkDir(mainDir.str()) == false)
   {
     SPM_LOG(SPMDebug::Info, "'.spm/logs' directory created");
-    spmUtils.makeDir(mainDir.str());
+    SPMUtils::makeDir(mainDir.str());
   }
   else
   {
@@ -124,7 +124,7 @@ GOD DAMN
   mainDir << SPMUtils::GetHomeDir() << "\\.spm\\spm.conf";
 #endif
   SPM_LOG(SPMDebug::noType, "Main Directory: ", mainDir.str());
-  if(!spmUtils.checkFile(mainDir.str()))
+  if(!SPMUtils::checkFile(mainDir.str()))
   {
 	  defaultConfig.restrict_mode = true;
 	  defaultConfig.restrict_timeout = true;
@@ -132,13 +132,13 @@ GOD DAMN
 	  defaultConfig.debug_log = false;
 	  defaultConfig.rescrict_time_span = 8;
 	  defaultConfig.port = 8080;
-	  spmConf.Write(defaultConfig);
+	  SPMConfig::Write(defaultConfig);
 	}
-	else if(spmUtils.checkFile(mainDir.str()) == true)
+	else if(SPMUtils::checkFile(mainDir.str()) == true)
 	{
 	  SPM_LOG(SPMDebug::Success, "'.spm/spm.conf' found");
     // Once found read its settings and store them into the config structure
-    globalConf = spmConf.Read();
+    globalConf = SPMConfig::Read();
 	}
 
 	mainDir.str("");
@@ -154,7 +154,7 @@ GOD DAMN
 #endif
 
 	SPM_LOG(SPMDebug::noType, "File path to list: ", mainDir.str());
-	if(spmUtils.checkFile(mainDir.str()) == false)
+	if(SPMUtils::checkFile(mainDir.str()) == false)
 	{
 	  SPM_LOG(SPMDebug::Warn, "No main list has beed found");
 	}
@@ -162,8 +162,6 @@ GOD DAMN
 	{
 	  // Parse the main list
 	}
-	
-  
 }
 
 void SPM::Terminate()

@@ -17,50 +17,39 @@
 
 
 
-SPM spm_cls;
-SPMWakeOnLan wol;
-SPMDetect sdetect;
-SPMList spm_lst;
-SPM_SocketIO sckt_io;
-
-
 
 
 void Test1()
 {
 	std::cout << "Test1() -> SPM::Init()\n";
-	spm_cls.Init();
+	SPM::Init();
 }
 
 void Test2()
 {
 	std::cout << "Test2() -> SPMWakeOnLan::SndMagicPack()\n";
-	wol.SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
-	wol.SndMagicPack("6c:f0:49:a1:d9:e6", "192.168.1.255");
+	SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
+	//wol.SndMagicPack("6c:f0:49:a1:d9:e6", "192.168.1.255");
 	// 1c:6f:65:c2:e8:2f //g41MT-S2P
 	// 6c:f0:49:a1:d9:e6 // g41M-ES2L
 }
 
 void Test3()
 {
-	SPMDebug dbg;
 	std::vector<uint8_t> byte_array;
 	std::cout << "Test3() -> SPMWakeOnLan::parse_mac_addr()\n";
-	if(wol.parse_mac_addr("1c:6f:65:c2:e8:2f", byte_array))
+	if(SPMWakeOnLan::parse_mac_addr("1c:6f:65:c2:e8:2f", byte_array))
 	{
-		// dbg.Log(SPMDebug::Success, " * ", "Mac address parsed successfully");
 		SPM_LOG(SPMDebug::Success, "Mac address parsed successfully");
 	}
 	else
 	{
-		// dbg.Log(SPMDebug::Err, " * ", "Failed to parse mac address");
 		SPM_LOG(SPMDebug::Err, "Failed to parse mac address");
 	}
 }
 
 void Test4()
 {
-	SPMDebug dbg;
 	std::cout << "Test4() -> Log testing\n";
 	SPM_LOG(SPMDebug::Info, "Info Test");
 	SPM_LOG(SPMDebug::Success, "Success Test");
@@ -70,21 +59,20 @@ void Test4()
 
 void Test5()
 {
-	SPMDebug dbg;
-	dbg.MsgBoxLog(SPMDebug::Info, " * ", "Arg 1 ", "Arg 2 ", 5);
-	dbg.MsgBoxLog(SPMDebug::Success, " * ", "Success test " , "And another stringy string ", 48);
-	dbg.MsgBoxLog(SPMDebug::Warn, " * ", "Warning test ", "yet anoter text and a number idk ", 152);
-	dbg.MsgBoxLog(SPMDebug::Err, " * ", "This is some error ", " things work ok ig ", 196);
+	SPMDebug::MsgBoxLog(SPMDebug::Info, " * ", "Arg 1 ", "Arg 2 ", 5);
+	SPMDebug::MsgBoxLog(SPMDebug::Success, " * ", "Success test " , "And another stringy string ", 48);
+	SPMDebug::MsgBoxLog(SPMDebug::Warn, " * ", "Warning test ", "yet anoter text and a number idk ", 152);
+	SPMDebug::MsgBoxLog(SPMDebug::Err, " * ", "This is some error ", " things work ok ig ", 196);
 }
 
 void Test6()
 {
-	std::vector<std::string> dummy = sdetect.CreateIP_Table();
+	std::vector<std::string> dummy = SPMDetect::CreateIP_Table();
 }
 
 void Test7()
 {
-	std::vector<SPMList::computer> someList = spm_lst.ReadComputerList();
+	std::vector<SPMList::computer> someList = SPMList::ReadComputerList();
 
 	for(int i = 0; i < someList.size(); i++)
 	{
@@ -95,10 +83,8 @@ void Test7()
 
 void Test8()
 {
-	SPMDebug dbg;
 	for(int i = 0; i < 5; i++)
 	{
-		// dbg.Log(SPMDebug::Info, " * ", "Updating stuff");
 		SPM_LOG(SPMDebug::Info, "Updating stuff");
 	}
 }
@@ -106,15 +92,15 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	sckt_io.SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.102");
-	sckt_io.SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
+	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.102");
+	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
 void Test10()
 {
 	std::string file = "/home/0xsys/.spm/spm.conf";
 
-	if(!spmUtils.checkFile(file))
+	if(!SPMUtils::checkFile(file))
 	{
 		SPM_LOG(SPMDebug::Err, "File not Found");
 	}
@@ -128,15 +114,15 @@ void Test10()
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
-	Test1(); // Linux Pass
-	// Test2(); // Linux, Windows Pass
+	// Test1(); // Linux Pass
+	//Test2(); // Linux, Windows Pass
 	// Test3(); // 
 	// Test4(); // All pass
 	// Test5();
   // Test6();
 	// Test7();
 	// Test8();
-  // Test9();
+  Test9();
   // Test10();
 	return 0;
 }

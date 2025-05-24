@@ -18,18 +18,20 @@ void SysPowerOff()
 	int r;
 
 	r = sd_bus_open_system(&bus);
-	if (r < 0) {
+	if (r < 0)
+	{
 	  Log(Err, "Failed to connect to system bus: %s\n", strerror(-r));
 	}
 
   r = sd_bus_call_method(bus, "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "PowerOff", &error, NULL, "b", 0);
 
-  if (r < 0) {
+  if (r < 0)
+  {
 	  Log(Err, "Failed to execute poweroff: %s\n", error.message);
 	}
 
   sd_bus_error_free(&error);
-	sd_bus_unref(bus);                
+  sd_bus_unref(bus);                
 }
 
 
@@ -40,13 +42,15 @@ void SysReboot()
 	int r;
 
 	r = sd_bus_open_system(&bus);
-	if (r < 0) {
+	if (r < 0)
+	{
 	  Log(Err, "Failed to connect to system dbus: %s\n", strerror(-r));
 	}
 
 	r = sd_bus_call_method(bus, "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "Reboot", &error, NULL, "b", 0);
 
-	if (r < 0) {
+	if (r < 0)
+	{
 	  Log(Err, "Failed to execute reboot: %s\n", error.message);
 	}
 

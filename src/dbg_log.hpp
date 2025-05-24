@@ -47,8 +47,8 @@
 
 
 
-static SPMUtils spmUtils;
-static SPM spm;
+//static SPMUtils spmUtils;
+//static SPM spm;
 
 
 
@@ -81,36 +81,45 @@ inline void AppendToStream(std::ostringstream&) {}
 template <typename T, typename... Args>
 inline void AppendToStream(std::ostringstream& oss, T first, Args... rest)
 {
-    oss << first;
-    AppendToStream(oss, rest...);
+  oss << first;
+  AppendToStream(oss, rest...);
 }
 
 #ifdef __linux__
-inline std::vector<std::string> parseCommand(const std::string& command) {
-    std::vector<std::string> args;
-    std::istringstream stream(command);
-    std::string arg;
-    bool inQuotes = false;
-    std::string temp;
+inline std::vector<std::string> parseCommand(const std::string& command)
+{
+  std::vector<std::string> args;
+  std::istringstream stream(command);
+  std::string arg;
+  bool inQuotes = false;
+  std::string temp;
 
-    while (stream) {
-        char c = stream.get();
-        if (stream.eof()) break;
+  while (stream)
+  {
+    char c = stream.get();
+    if(stream.eof()) break;
 
-        if (c == '"' || c == '\'') {  // Handle both single and double quotes
-            inQuotes = !inQuotes;
-        } else if (c == ' ' && !inQuotes) {  // Space outside quotes
-            if (!temp.empty()) {
-                args.push_back(temp);
-                temp.clear();
-            }
-        } else {
-            temp += c;
-        }
+    if(c == '"' || c == '\'')
+    {  // Handle both single and double quotes
+        inQuotes = !inQuotes;
     }
+    else if(c == ' ' && !inQuotes)
+    {
+      // Space outside quotes
+      if (!temp.empty())
+      {
+        args.push_back(temp);
+        temp.clear();
+      }
+    }
+    else
+    {
+      temp += c;
+    }
+  }
 
-    if (!temp.empty()) args.push_back(temp);
-    return args;
+  if (!temp.empty()) args.push_back(temp);
+  return args;
 }
 #endif
 
@@ -212,7 +221,7 @@ class SPMDebug
     std::cout << std::endl;
     
     // Setting parsing needs to be fixed to get this to work 
-    if(!spm.globalConf.debug_log)
+    if(!globalConf.debug_log)
     {
       std::ostringstream logName;
 
@@ -220,11 +229,11 @@ class SPMDebug
 
 // Create the log filename containing the current date
 #ifdef __linux__
-      logName << SPMUtils::GetHomeDir() << "/.spm/logs/spm_log - " << spmUtils.GetCurrentDate();
+      logName << SPMUtils::GetHomeDir() << "/.spm/logs/spm_log - " << SPMUtils::GetCurrentDate();
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-      logName << SPMUtils::GetHomeDir() << "\\.spm\\logs\\spm_log - " << spmUtils.GetCurrentDate() << ".txt";
+      logName << SPMUtils::GetHomeDir() << "\\.spm\\logs\\spm_log - " << SPMUtils::GetCurrentDate() << ".txt";
 #endif 
 
       std::ofstream out_log_init(logName.str());
@@ -242,7 +251,7 @@ class SPMDebug
     }
   }
   template<typename T, typename... Args >
-  inline void MsgBoxLog(int logType, T mainStr, Args... r)
+  static void MsgBoxLog(int logType, T mainStr, Args... r)
   {
     std::ostringstream text;
 #ifdef NO_MSGBOX
@@ -285,8 +294,9 @@ class SPMDebug
     std::vector<std::string> args = parseCommand(command);
 
     std::vector<char*> c_args;
-    for (auto& s : args) {
-        c_args.push_back(s.data());  // Convert std::string to char*
+    for (auto& s : args)
+    {
+      c_args.push_back(s.data());  // Convert std::string to char*
     }
     c_args.push_back(nullptr);  // Null-terminate
 

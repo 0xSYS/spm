@@ -22,10 +22,10 @@
 
 
 
-SPMList spmList;
-SPM spm;
-SPMWakeOnLan wol;
-SPM_SocketIO sckt_io;
+//SPMList spmList;
+//SPM spm;
+//SPMWakeOnLan wol;
+//SPM_SocketIO sckt_io;
 
 
 
@@ -396,7 +396,7 @@ bool MyApp::OnInit() {
 MyFrame::MyFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(800, 600)) {
     wxMenuBar* menuBar = new wxMenuBar();
     wxStreamToTextRedirector redirect(text);
-    spm.Init();
+    SPM::Init();
     std::cout<<text;
     // Create menus
     wxMenu* signalMenu = new wxMenu();
@@ -458,7 +458,7 @@ void MyFrame::CreateDeviceGrid() {
 		const wxPoint &  	pos = wxDefaultPosition,
 		const wxSize &  	size = wxDefaultSize,  */
     
-    devices = spmList.ReadComputerList();
+    devices = SPMList::ReadComputerList();
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   
     deviceGrid = new wxGrid(this, wxID_ANY);
@@ -514,14 +514,14 @@ void MyFrame::SendOnSignal(wxCommandEvent& event)
 {
     wxString broadcast_addr = deviceGrid->GetCellValue(selrow, 2);
     wxString mac_addr = deviceGrid->GetCellValue(selrow, 3); 
-    wol.SndMagicPack(mac_addr.ToStdString(), broadcast_addr.ToStdString());
+    SPMWakeOnLan::SndMagicPack(mac_addr.ToStdString(), broadcast_addr.ToStdString());
     wxMessageBox("Signal has been sent succesfully!", "Signal", wxOK | wxICON_INFORMATION);
 }
 
 void MyFrame::OnPoweroffClick(wxCommandEvent& event)
 {
     wxString dev_ip = deviceGrid->GetCellValue(selrow, 1);
-    sckt_io.SndPowerAction(SPM_SocketIO::Poweroff, dev_ip.ToStdString());
+    SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, dev_ip.ToStdString());
     // wxMessageBox("Signal has been sent successfully !", "Signal poweroff", wxOK || wxICON_INFORMATION);
 }
 
@@ -529,7 +529,7 @@ void MyFrame::OnRebootClick(wxCommandEvent& event)
 {
     wxString dev_ip = deviceGrid->GetCellValue(selrow, 1);
     std::cout << "IP: " << dev_ip.ToStdString() << "\n";
-    sckt_io.SndPowerAction(SPM_SocketIO::Reboot, dev_ip.ToStdString());
+    SPM_SocketIO::SndPowerAction(SPM_SocketIO::Reboot, dev_ip.ToStdString());
     // wxMessageBox("Signal has been sent succesfully!", "Signal reboot", wxOK | wxICON_INFORMATION);
 }
 

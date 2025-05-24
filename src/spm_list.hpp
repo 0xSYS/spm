@@ -29,9 +29,9 @@ class SPMList
       bool restricted;
     }server;
 
-    std::vector <computer> ReadComputerList();
-    server ReadServerList();
+    static std::vector <computer> ReadComputerList();
+    static server ReadServerList();
 
-    void WriteComputerList();
-    void WriteServerList();
+    static void WriteComputerList();
+    static void WriteServerList();
 };

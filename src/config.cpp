@@ -58,7 +58,7 @@ SPMConfig::cfgStruct SPMConfig::Read()
   in_path << SPMUtils::GetHomeDir() << "\\.spm\\spm.conf"; // Create the file location of the config file
 #endif
 
-  if(!spmUtils.checkFile(in_path.str()))
+  if(!SPMUtils::checkFile(in_path.str()))
   {
     SPM_LOG(SPMDebug::Err, "spm.conf not found !");
   }
