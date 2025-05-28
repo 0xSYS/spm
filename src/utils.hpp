@@ -18,7 +18,7 @@ class SPMUtils
   static bool checkFile(std::string f);
   static bool ping(const std::string & ip);
 #if defined(_WIN32) || defined(_WIN64)
-  void SetWinTerm();
+  static void SetWinTerm();
 #endif
 	
 };

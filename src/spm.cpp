@@ -16,7 +16,9 @@ Main Source file of SPM library
 #include <sys/stat.h>
 #include <type_traits>
 
-#include <unistd.h>
+#ifdef __linux
+  #include <unistd.h>
+#endif
 
 #if defined(_WIN32) || defined(_WIN64)
   #include <Windows.h>
