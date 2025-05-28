@@ -22,7 +22,7 @@ class SPM
   std::vector<SPMList::computer> mainList; // Store the main list at first run
 
   
-	static void Init();
+	static void Init(SPMConfig::cfgStruct* settings_init);
 	static void SaveCustomLogFile(std::string f); // To do
 	static void LoadCustomDevList(std::string f);
 	static void SaveCustomDevList(std::string f);

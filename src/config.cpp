@@ -24,6 +24,9 @@ void SPMConfig::Write(cfgStruct cfg_out)
   config["Settings"]["pcStat"]                    = cfg_out.pc_status_mpack;
   // config["Settings"]["CLIMode"] = cfg_out.cli_mode; // No longer needed
   config["Settings"]["dbgLog"]                    = cfg_out.debug_log;
+  config["Settings"]["wolPort"]                   = cfg_out.wolPort;
+  config["Settings"]["msgbox"]                    = cfg_out.msgBox_log;
+  config["Settings"]["usrFeedback"]               = cfg_out.user_feedback;
   // config["Restricted_session"]["autolink"]        = cfg_out.restrict_autolink; // Still no ideea what that is lmaooo
   config["RestrictedSession"]["restrictMode"]     = cfg_out.restrict_mode;
   config["RestrictedSession"]["timeoutSession"]   = cfg_out.restrict_timeout;
@@ -73,6 +76,9 @@ SPMConfig::cfgStruct SPMConfig::Read()
 
     cfg_in.debug_log          = in_config["Settings"]["dbgLog"].as<bool>();
     cfg_in.pc_status_mpack    = in_config["Settings"]["pcStat"].as<bool>();
+    cfg_in.user_feedback      = in_config["Settings"]["usrFeedback"].as<bool>();
+    cfg_in.wolPort            = in_config["Settings"]["wolPort"].as<int>();
+    cfg_in.msgBox_log         = in_config["Settings"]["msgbox"].as<bool>();
     cfg_in.rescrict_time_span = in_config["RestrictedSession"]["timeoutTimeSpan"].as<int>();
     cfg_in.restrict_timeout   = in_config["RestrictedSession"]["timeoutSession"].as<bool>();
     cfg_in.restrict_mode      = in_config["RestrictedSession"]["restrictMode"].as<bool>();

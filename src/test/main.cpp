@@ -22,7 +22,7 @@
 void Test1()
 {
 	std::cout << "Test1() -> SPM::Init()\n";
-	SPM::Init();
+	SPM::Init(nullptr);
 }
 
 void Test2()
@@ -114,7 +114,7 @@ void Test10()
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
-	// Test1(); // Linux Pass
+	Test1(); // Linux Pass
 	//Test2(); // Linux, Windows Pass
 	// Test3(); // 
 	// Test4(); // All pass
@@ -122,7 +122,7 @@ int main(int argc, char * argv[])
   // Test6();
 	// Test7();
 	// Test8();
-  Test9();
+  //Test9();
   // Test10();
 	return 0;
 }

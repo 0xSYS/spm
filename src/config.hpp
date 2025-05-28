@@ -20,6 +20,7 @@ class SPMConfig
   public:
 	  typedef struct
 	  {
+			bool config_storage;                  // Enable / disable settings storage
 	    bool pc_status_mpack;                 // Enable / disable pc status globally
       bool msgBox_log;                      // Enable / disable message boxes
       bool debug_log;                       // Enable / disable debug log to file (logs are stored in /home/user/.spm/logs)

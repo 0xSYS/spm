@@ -396,7 +396,7 @@ bool MyApp::OnInit() {
 MyFrame::MyFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(800, 600)) {
     wxMenuBar* menuBar = new wxMenuBar();
     wxStreamToTextRedirector redirect(text);
-    SPM::Init();
+    SPM::Init(nullptr);
     std::cout<<text;
     // Create menus
     wxMenu* signalMenu = new wxMenu();
