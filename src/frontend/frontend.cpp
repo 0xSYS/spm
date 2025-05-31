@@ -86,7 +86,7 @@ private:
         
     };*/
   
-    std::vector<SPMList::computer> devices;
+    std::vector<SPMList::device> devices;
 
 };
 
@@ -458,7 +458,7 @@ void MyFrame::CreateDeviceGrid() {
 		const wxPoint &  	pos = wxDefaultPosition,
 		const wxSize &  	size = wxDefaultSize,  */
     
-    devices = SPMList::ReadComputerList();
+    devices = SPMList::ReadDevList();
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   
     deviceGrid = new wxGrid(this, wxID_ANY);
@@ -482,9 +482,9 @@ void MyFrame::CreateDeviceGrid() {
     // Populate the grid with device data
     for (size_t i = 0; i < devices.size(); ++i) {
         deviceGrid->SetCellValue(i, 0, devices[i].name);
-        deviceGrid->SetCellValue(i, 1, devices[i].defaultIP);
-        deviceGrid->SetCellValue(i, 2, devices[i].broadcastIP);
-        deviceGrid->SetCellValue(i, 3, devices[i].macAddr);
+        deviceGrid->SetCellValue(i, 1, devices[i].os_ip);
+        deviceGrid->SetCellValue(i, 2, devices[i].broadcast_ip);
+        deviceGrid->SetCellValue(i, 3, devices[i].mac_addr);
         deviceGrid->SetCellValue(i, 5, devices[i].notes);
     }
 

@@ -10,7 +10,7 @@
 #include "../dev_detect.hpp"
 #include "../utils.hpp"
 #include "../dbg_log.hpp"
-#include "../globals.hpp"
+//#include "../globals.hpp"
 #include "../spm_list.hpp"
 #include "../sckt_io.hpp"
 
@@ -72,11 +72,11 @@ void Test6()
 
 void Test7()
 {
-	std::vector<SPMList::computer> someList = SPMList::ReadComputerList();
+	std::vector<SPMList::device> someList = SPMList::ReadDevList();
 
 	for(int i = 0; i < someList.size(); i++)
 	{
-		std::cout << someList[i].name << " " << someList[i].broadcastIP << " " << someList[i].broadcastIP << " " << someList[i].macAddr << "\n";
+		std::cout << someList[i].name << " " << someList[i].broadcast_ip << " " << someList[i].broadcast_ip << " " << someList[i].mac_addr << "\n";
 
 	}
 }
@@ -110,19 +110,46 @@ void Test10()
 	}
 }
 
+void Test11()
+{
+  std::cout << "Test11() -> default Env check testing\n";
+  
+  SPM::CheckDefaultEnv();
+}
+
+void Test12()
+{
+  std::cout << " Test12() -> CreateNewEnv()\n";
+  SPM::CreateNewEnv(1);
+  SPM::CreateNewEnv(2);
+  //SPM::CreateNewEnv(3);
+  //SPM::CreateNewEnv(4);
+}
+
+void Test13()
+{
+  std::cout << "Test13() -> RemoveEnv()\n";
+  
+  SPM::RemoveEnv(0);
+  //SPM::RemoveEnv(2);
+}
+
 
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
-	Test1(); // Linux Pass
-	//Test2(); // Linux, Windows Pass
+	// Test1(); // Linux Pass
+	// Test2(); // Linux, Windows Pass
 	// Test3(); // 
 	// Test4(); // All pass
 	// Test5();
   // Test6();
 	// Test7();
 	// Test8();
-  //Test9();
+  // Test9();
   // Test10();
+  // Test11();
+  // Test12();
+  Test13();
 	return 0;
 }

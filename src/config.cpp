@@ -46,6 +46,12 @@ void SPMConfig::Write(cfgStruct cfg_out)
         { "timeout",  cfg_out.restrict_timeout   },
         { "timespan", cfg_out.rescrict_time_span }
       }
+    },
+    {
+      "environments",
+      {
+        { "lastEnvCreated", cfg_out.last_env_index }
+      }
     }
   };
   
@@ -107,6 +113,10 @@ SPMConfig::cfgStruct SPMConfig::Read()
   cfg_in.restrict_mode      = restrictedSession_obj["enabled"];
   cfg_in.restrict_timeout   = restrictedSession_obj["timeout"];
   cfg_in.rescrict_time_span = restrictedSession_obj["timespan"];
+  
+  nlohmann::json environments_obj = json_in["environments"];
+  
+  cfg_in.last_env_index = environments_obj["lastEnvCreated"];
   
   return cfg_in;
 }

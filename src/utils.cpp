@@ -6,9 +6,11 @@
 #include <cstdlib>
 #include <string>
 #include <sstream>
+#include <random>
 
 #ifdef __linux__
   #include <unistd.h>
+  #include <dirent.h>
 #endif
 
 #include <sys/stat.h>
@@ -78,6 +80,95 @@ void SPMUtils::makeDir(std::string d)
 #endif
 }
 
+int SPMUtils::removeDir(std::string d)
+{
+#ifdef __linux__
+  int r = -1;
+  DIR *dir = opendir(d.c_str());
+  size_t path_len = strlen(d.c_str());
+
+  if(dir)
+  {
+    struct dirent *p;
+    r = 0;
+    while(!r && (p = readdir(dir)))
+    {
+      int r2 = -1;
+      char *buf;
+      size_t len;
+      
+      // Skip "." and ".."
+      if(!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+        continue;
+      
+      len = path_len + strlen(p->d_name) + 2;
+      buf = (char *)malloc(len);
+      
+      if(buf)
+      {
+        struct stat statbuf;
+        snprintf(buf, len, "%s/%s", d.c_str(), p->d_name);
+        if(!stat(buf, &statbuf))
+        {
+          if(S_ISDIR(statbuf.st_mode))
+          r2 = SPMUtils::removeDir(buf);
+          else
+          r2 = unlink(buf);
+        }
+        free(buf);
+      }
+      r = r2;
+    }
+    closedir(dir);
+  }
+  
+  if (!r)
+  r = rmdir(d.c_str());
+  
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+  std::string searchPath = d + "\\*";
+  WIN32_FIND_DATA findData;
+  HANDLE hFind = FindFirstFile(searchPath.c_str(), &findData);
+
+  if(hFind == INVALID_HANDLE_VALUE)
+    return -1;
+
+    int r = 0;
+    do
+    {
+      const char* name = findData.cFileName;
+      if(strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+        continue;
+
+      std::string fullPath = d + "\\" + name;
+
+      if(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+      {
+        // It's a directory, recurse
+        if(removeDirWin(fullPath) != 0)
+          r = -1;
+      }
+      else
+      {
+        // It's a file or symlink, delete it
+        if(!DeleteFile(fullPath.c_str()))
+          r = -1;
+      }
+    }
+    while(FindNextFile(hFind, &findData) != 0);
+
+    FindClose(hFind);
+
+    // Remove the now-empty directory
+    if(!RemoveDirectory(d.c_str()))
+      r = -1;
+#endif
+
+return r;
+}
+
 bool SPMUtils::checkDir(std::string d)
 {
   SPMDebug dbg;
@@ -136,7 +227,31 @@ void SPMUtils::printConfig(SPMConfig::cfgStruct c)
   << "[BOOL] -> user_feedback        = " << c.user_feedback        << "\n"
   << "[INT]  -> rescrict_time_span   = " << c.rescrict_time_span   << "\n"
   << "[INT]  -> port                 = " << c.port                 << "\n"
-  << "[INT]  -> wolPort              = " << c.wol_port             << "\n";
+  << "[INT]  -> wolPort              = " << c.wol_port             << "\n"
+  << "[INT]  -> last_env_index       = " << c.last_env_index       << "\n";
+}
+
+std::string SPMUtils::genRandomHash(size_t len)
+{
+  std::string out_hash;
+  
+  const char charset[] =
+  "0123456789"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "abcdefghijklmnopqrstuvwxyz";
+  
+  const size_t max_index = (sizeof(charset) - 1);
+  
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dis(0, max_index - 1);
+  
+  for (size_t i = 0; i < len; ++i)
+  {
+    out_hash += charset[dis(gen)];
+  }
+  
+  return out_hash;
 }
 
 #if defined(_WIN32) || defined(_WIN64)

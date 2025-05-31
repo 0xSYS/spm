@@ -12,6 +12,7 @@ Main Source file of SPM library
 #include <cstdlib>
 #include <string>
 #include <sstream>
+#include <nlohmann/json.hpp>
 
 #include <sys/stat.h>
 #include <type_traits>
@@ -35,9 +36,15 @@ Main Source file of SPM library
 #include "spm_list.hpp"
 
 
-// SPMUtils spmUtils; // Moved to globals.hpp
-//SPMConfig spmConf;
-SPMList spmLst;
+
+
+
+
+/*
+! - - - - - - - - !
+! Initialization  !
+! - - - - - - - - !
+*/
 
 
 void SPM::Init(SPMConfig::cfgStruct* settings_init)
@@ -82,17 +89,18 @@ void SPM::Init(SPMConfig::cfgStruct* settings_init)
     SPM_LOG(SPMDebug::Success, "'.spm' directory found");
   }
 
-  mainDir << "/lists";
+  //mainDir << "/lists";
 
-  SPM_LOG(SPMDebug::Info, "Checking for '.spm/lists' directory...");
-  if(SPMUtils::checkDir(mainDir.str()) == false)
-  {
-    SPMUtils::makeDir(mainDir.str());
-  }
-  else
-  {
-    SPM_LOG(SPMDebug::Success, "'.spm/lists' directory found");
-  }
+  //SPM_LOG(SPMDebug::Info, "Checking for '.spm/lists' directory...");
+  //if(SPMUtils::checkDir(mainDir.str()) == false)
+  //{
+  //  SPMUtils::makeDir(mainDir.str());
+  //}
+  //else
+  //{
+  //  SPM_LOG(SPMDebug::Success, "'.spm/lists' directory found");
+  //}
+  SPM::CreateDefaultEnv();
   mainDir.str(""); // Reset the string content so it dosen't retain the previous directories
   mainDir.clear(); // And clear any lefrover errors
 
@@ -143,6 +151,7 @@ GOD DAMN
       defaultConfig.user_feedback = false;
       defaultConfig.msgbox_log = true;
       defaultConfig.power_opts_callbacks = true;
+      defaultConfig.last_env_index = 0;
       globalConf = defaultConfig;
       SPMConfig::Write(defaultConfig);
     }
@@ -182,6 +191,245 @@ GOD DAMN
 	{
 	  // Parse the main list
 	}
+}
+
+/*
+! - - - - - - - - - - - - !
+! Environment management  !
+! - - - - - - - - - - - - !
+*/
+
+void SPM::CreateDefaultEnv()
+{
+  std::ostringstream env_path;
+  nlohmann::json env_info;
+  
+  
+  // Directory creation
+  
+  /* Breakdown:
+  - Checks for .spm/data directory. If not existing it creates the data directory
+  This is where all environments are stored (including the default storage environment)
+  Example: env_0 (the default), env_1, env_2, env_3, ...
+  
+  - Checks for .spm/data/env_0 (The default environment). If not existing it creates the env_0 directory
+  env_0, env_1, ... holds info.spmenv, dev_list.sls, ip_table.sls (.sls = Spm LiSt)
+  
+  - Creates the info.spmenv file (Very important file when synchronizing the environment from desktop to mobile)
+  */
+#ifdef __linux__
+	env_path << SPMUtils::GetHomeDir() << "/.spm/";
+#endif
+  
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << SPMUtils::GetHomeDir() << "\\.spm\\";
+#endif
+
+
+#ifdef __linux__
+  env_path << "data/";
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << "data\\";
+#endif
+
+  SPM_LOG(SPMDebug::Info, "Creating Default storage environment");
+  
+  if(SPMUtils::checkDir(env_path.str()) == false)
+  {
+    SPM_LOG(SPMDebug::Info, "'.spm/data' directory created");
+    SPMUtils::makeDir(env_path.str());
+  }
+  else
+  {
+    SPM_LOG(SPMDebug::Success, "'.spm/data' directory found");
+  }
+  
+#ifdef __linux__  
+  env_path << "env_0/";
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << "env_0\\";
+#endif
+  
+  if(SPMUtils::checkDir(env_path.str()) == false)
+  {
+    SPM_LOG(SPMDebug::Info, "'.spm/data/env_0' directory created");
+    SPMUtils::makeDir(env_path.str());
+  }
+  else
+  {
+    SPM_LOG(SPMDebug::Success, "'.spm/data/env_0' directory found");
+  }
+  
+  // Create a small binary encoded json file containing minimal information about the created storage environment
+  env_info =
+  {
+    { "dateCreated", SPMUtils::GetCurrentDate() },
+    { "name", "Default Environment" },
+    { "description", "The default storage environment for spm" },
+    { "uniqueIdentifier", SPMUtils::genRandomHash(16) /*give it a random hash made out of 16 characters to avoid confusion in between multiple default storage environments*/ },
+    { "index", 0 }
+  };
+  
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << "\\info.spmenv";
+#endif
+
+#ifdef __linux__
+  env_path << "/info.spmenv";
+#endif
+  
+  // Serialization to MessagePack
+  std::vector<std::uint8_t> msgpack_dat = nlohmann::json::to_msgpack(env_info);
+  std::ofstream out_env_info(env_path.str(), std::ios::binary);
+  out_env_info.write(reinterpret_cast<const char*>(msgpack_dat.data()), msgpack_dat.size());
+  out_env_info.close();
+}
+
+void SPM::CheckDefaultEnv()
+{
+  std::ostringstream env_path;
+  
+#ifdef __linux__  
+  env_path << SPMUtils::GetHomeDir() << "/.spm/data/env_0/";
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << SPMUtils::GetHomeDir() << "\\.spm\\data\\env_0\\";
+#endif
+
+  env_path << "info.spmenv";
+  std::cout << "env_path: " << env_path.str() << "\n";
+  if(SPMUtils::checkFile(env_path.str()) == false)
+	{
+	  SPM_LOG(SPMDebug::Err, "Missing default env information");
+		SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing default environment information !!!");
+	}
+	else
+	{
+	  SPM_LOG(SPMDebug::Success, "Default environment info found !");
+	}
+  
+}
+
+void SPM::CreateNewEnv(int env_index)
+{
+  std::ostringstream env_path;
+  nlohmann::json env_info;
+  bool allow_next_step = true;
+  std::vector<bool> existing_env;
+  
+  SPM_LOG(SPMDebug::Info, "Creating new environment. Index: ", env_index);
+  
+#ifdef __linux
+  env_path << SPMUtils::GetHomeDir() << "/.spm/data/";
+#endif
+   
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << SPMUtils::GetHomeDir() << "\\.spm\\data\\";
+#endif
+
+
+#ifdef __linux__  
+  env_path << "env_" << env_index << "/";
+#endif
+ 
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << "env_" << env_index << "\\";
+#endif
+   
+
+  // Check for existing environments
+  if(SPMUtils::checkDir(env_path.str()))
+  {
+    SPM_LOG(SPMDebug::Err, "env_", env_index , " Already exists !!!");
+    SPMDebug::MsgBoxLog(SPMDebug::Err, "environment ", env_index, " Already exists !!!");
+    allow_next_step = false;
+  }
+  else
+    allow_next_step = true;
+	
+  
+  // Trying to prevent env creation unless if there's no preexisting env
+  if(allow_next_step)
+  {
+    SPMUtils::makeDir(env_path.str());
+   
+    // Create a small binary encoded json file containing minimal information about the created storage environment
+    env_info =
+    {
+      { "dateCreated", SPMUtils::GetCurrentDate() },
+      { "description", "The default storage environment for spm" },
+      { "uniqueIdentifier", SPMUtils::genRandomHash(16) /*give it a random hash made out of 16 characters to avoid confusion in between multiple default storage environments*/ },
+      { "index", env_index }
+    };
+   
+#if defined(_WIN32) || defined(_WIN64)
+    env_path << "\\info.spmenv";
+#endif
+ 
+#ifdef __linux__
+    env_path << "/info.spmenv";
+#endif
+   
+    // Serialization to MessagePack
+    std::vector<std::uint8_t> msgpack_dat = nlohmann::json::to_msgpack(env_info);
+    std::ofstream out_env_info(env_path.str(), std::ios::binary);
+    out_env_info.write(reinterpret_cast<const char*>(msgpack_dat.data()), msgpack_dat.size());
+    out_env_info.close();
+    SPM_LOG(SPMDebug::Success, "Environment successfully created !");
+  }
+}
+
+void SPM::RemoveEnv(int env_index)
+{
+  std::ostringstream env_path;
+#ifdef __linux
+  env_path << SPMUtils::GetHomeDir() << "/.spm/data/";
+#endif
+   
+#if defined(_WIN32) || defined(_WIN64)
+  env_path << SPMUtils::GetHomeDir() << "\\.spm\\data\\";
+#endif
+
+  // Prevent removal of the default env
+  if(env_index == 0)
+    SPM_LOG(SPMDebug::Err, "Cannot remove env_0 !!! aka default environment");
+  else
+  {
+
+    // Check for these files
+    // if one of them exists the env removal action is prevented
+    std::ostringstream temp1;
+    temp1 << env_path.str() << "dev_list.sls";
+    
+    std::ostringstream temp2;
+    temp2 << env_path.str() << "ip_table.sls";
+    
+    std::ostringstream temp3;
+    temp3 << env_path.str() << "commands.sls";
+    if(SPMUtils::checkFile(temp1.str()))
+    {
+      SPM_LOG(SPMDebug::Err, "dev_list.sls exists !!!");
+    }
+    else if(SPMUtils::checkFile(temp2.str()))
+    {
+      SPM_LOG(SPMDebug::Err, "ip_table.sls exists !!!");
+    }
+    else if(SPMUtils::checkFile(temp3.str()))
+    {
+      SPM_LOG(SPMDebug::Err, "commands.sls exists !!!");
+    }
+    else
+    {
+      // You can remove the env if none of these files exist
+      env_path << "env_" << env_index;
+      SPMUtils::removeDir(env_path.str());
+    }
+  }
 }
 
 void SPM::Terminate()

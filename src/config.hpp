@@ -20,7 +20,6 @@ class SPMConfig
   public:
 	  typedef struct
 	  {
-			//bool config_storage;                  // Enable / disable settings storage (This must Not be written to json)
 	    bool dev_status_mpack;                // Enable / disable device status globally
       bool msgbox_log;                      // Enable / disable message boxes
       bool debug_log;                       // Enable / disable debug log to file (logs are stored in /home/user/.spm/logs)
@@ -29,6 +28,7 @@ class SPMConfig
       bool power_opts_callbacks;            // Enable / disable socket callbacks when sending power events
       bool user_feedback;                   // Enable / disable user feedback trough message boxes
       int rescrict_time_span;               // Set ammount of time a rescricted session can last (in minutes)
+      int last_env_index;                   // Store the last created environment
       std::string restr_list_path;          // Set custom path for the encrypted pc list
       int usr_index;                        // Maps all users that can run in restricted mode with a number (usr1, usr2)
       int port;                             // Set custom port for poweroff / reboot packets

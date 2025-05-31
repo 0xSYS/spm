@@ -10,28 +10,16 @@ class SPMList
   public:
     typedef struct
     {
-      int index; // Used only internally by the software
       std::string name;
-      std::string macAddr;
-      std::string broadcastIP;
-      std::string defaultIP;
+      std::string interface_type;
+      std::string mac_addr;
+      std::string broadcast_ip;
+      std::string bmc_ip_addr; // IMPI specific
+      std::string os_ip;
       std::string notes;
-      bool restricred; 
-    }computer;
+      bool restricred;
+    }device;
 
-    // Incomplete
-    // General IPMI specs are required
-    typedef struct
-    {
-      int index;
-      std::string name;
-      std::string IP;
-      bool restricted;
-    }server;
-
-    static std::vector <computer> ReadComputerList();
-    static server ReadServerList();
-
-    static void WriteComputerList();
-    static void WriteServerList();
+    static std::vector <device> ReadDevList();
+    static void WriteDevList();
 };
