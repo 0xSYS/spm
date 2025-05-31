@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include "config.hpp"
 
 
 
@@ -17,6 +18,7 @@ class SPMUtils
   static bool checkDir(std::string d);
   static bool checkFile(std::string f);
   static bool ping(const std::string & ip);
+  static void printConfig(SPMConfig::cfgStruct c);
 #if defined(_WIN32) || defined(_WIN64)
   static void SetWinTerm();
 #endif

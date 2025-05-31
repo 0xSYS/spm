@@ -21,7 +21,7 @@
 
 void Test1()
 {
-	std::cout << "Test1() -> SPM::Init()\n";
+	std::cout << "Test1() -> SPM::Init(nullptr)\n";
 	SPM::Init(nullptr);
 }
 
@@ -98,7 +98,7 @@ void Test9()
 
 void Test10()
 {
-	std::string file = "/home/0xsys/.spm/spm.conf";
+	std::string file = "/home/0xsys/.spm/config.json";
 
 	if(!SPMUtils::checkFile(file))
 	{
@@ -126,12 +126,3 @@ int main(int argc, char * argv[])
   // Test10();
 	return 0;
 }
-
-
-/*
-Temp stuff
-
-https://github.com/MichaelDipperstein/ezini/blob/master/sample.c
-https://github.com/benhoyt/inih/tree/master
-https://github.com/compuphase/minIni/blob/master/dev/test.c
-*/

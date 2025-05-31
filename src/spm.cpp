@@ -120,100 +120,45 @@ What an idiot.
 I spent almost 4 fucking hours trying to find out why my fronted wasn't working at all and I js foudn out I forgot to update the fucking file extensions (Down below)
 GOD DAMN
 */
-  mainDir << SPMUtils::GetHomeDir() << "/.spm/spm.conf";
+  mainDir << SPMUtils::GetHomeDir() << "/.spm/config.json";
 #endif
 
   // Check for custom settings
   if(settings_init == nullptr)
   {
 #if defined(_WIN32) || defined(_WIN64)
-    mainDir << SPMUtils::GetHomeDir() << "\\.spm\\spm.conf";
+    mainDir << SPMUtils::GetHomeDir() << "\\.spm\\config.json";
 #endif
     SPM_LOG(SPMDebug::noType, "Main Directory: ", mainDir.str());
     if(!SPMUtils::checkFile(mainDir.str()))
     {
+      //defaultConfig.config_storage = true; // Just stupid. Simply use the nullptr instead
       defaultConfig.restrict_mode = true;
       defaultConfig.restrict_timeout = true;
-      defaultConfig.pc_status_mpack = true;
+      defaultConfig.dev_status_mpack = true;
       defaultConfig.debug_log = false;
       defaultConfig.rescrict_time_span = 8;
       defaultConfig.port = 8080;
-      defaultConfig.wolPort = 10;
+      defaultConfig.wol_port = 10;
       defaultConfig.user_feedback = false;
-      defaultConfig.msgBox_log = true;
+      defaultConfig.msgbox_log = true;
       defaultConfig.power_opts_callbacks = true;
       globalConf = defaultConfig;
       SPMConfig::Write(defaultConfig);
     }
 	  else if(SPMUtils::checkFile(mainDir.str()) == true)
 	  {
-		  SPM_LOG(SPMDebug::Success, "'.spm/spm.conf' found");
+		  SPM_LOG(SPMDebug::Success, "'.spm/config.json' found");
 		  // Once found read its settings and store them into the config structure
 		  globalConf = SPMConfig::Read();
-				
-				std::cout << "Stored settings:\n" <<
-    "globalConf:\n" <<
-    "config_storage: " <<
-    globalConf.config_storage <<
-    "pc_status_mpack: " <<
-    globalConf.pc_status_mpack <<
-    "msgBox_log: " <<
-    globalConf.msgBox_log <<
-    "debug_log: " <<
-    globalConf.debug_log <<
-    "restrict_mode: " <<
-    globalConf.restrict_mode <<
-    "restrict_timeout: " <<
-    globalConf.restrict_timeout <<
-    "power_opts_callbacks: " <<
-    globalConf.power_opts_callbacks <<
-    "user_feedback: " <<
-    globalConf.user_feedback <<
-    "rescrict_time_span: " <<
-    globalConf.rescrict_time_span <<
-    "restr_list_path: " <<
-    globalConf.restr_list_path <<
-    "usr_index: " <<
-    globalConf.usr_index <<
-    "port: " <<
-    globalConf.port <<
-    "wolPort: " <<
-    globalConf.wolPort;
+		  SPMUtils::printConfig(globalConf);
 	  }
   }
   else
   {
     // Get custom settings and sync to the global settings
     globalConf =* settings_init;
-    std::cout << "Custom settings:\n" <<
-    "globalConf:\n" <<
-    "config_storage: " <<
-    globalConf.config_storage <<
-    "pc_status_mpack: " <<
-    globalConf.pc_status_mpack <<
-    "msgBox_log: " <<
-    globalConf.msgBox_log <<
-    "debug_log: " <<
-    globalConf.debug_log <<
-    "restrict_mode: " <<
-    globalConf.restrict_mode <<
-    "restrict_timeout: " <<
-    globalConf.restrict_timeout <<
-    "power_opts_callbacks: " <<
-    globalConf.power_opts_callbacks <<
-    "user_feedback: " <<
-    globalConf.user_feedback <<
-    "rescrict_time_span: " <<
-    globalConf.rescrict_time_span <<
-    "restr_list_path: " <<
-    globalConf.restr_list_path <<
-    "usr_index: " <<
-    globalConf.usr_index <<
-    "port: " <<
-    globalConf.port <<
-    "wolPort: " <<
-    globalConf.wolPort;
-    
+    SPMUtils::printConfig(globalConf);
   }
 
 	mainDir.str("");

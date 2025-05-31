@@ -1,9 +1,11 @@
 
 
 
+#include <nlohmann/json.hpp>
+
 
 #include <sstream>
-#include <inifile-cpp/inicpp.h>
+// fuck you #include <inifile-cpp/inicpp.h>
 
 
 #include "dbg_log.hpp"
@@ -17,74 +19,94 @@
 
 void SPMConfig::Write(cfgStruct cfg_out)
 {
-  ini::IniFile config;
+  nlohmann::json json_out;
   std::ostringstream out_path;
-
-  // Structure filling
-  config["Settings"]["pcStat"]                    = cfg_out.pc_status_mpack;
-  // config["Settings"]["CLIMode"] = cfg_out.cli_mode; // No longer needed
-  config["Settings"]["dbgLog"]                    = cfg_out.debug_log;
-  config["Settings"]["wolPort"]                   = cfg_out.wolPort;
-  config["Settings"]["msgbox"]                    = cfg_out.msgBox_log;
-  config["Settings"]["usrFeedback"]               = cfg_out.user_feedback;
-  // config["Restricted_session"]["autolink"]        = cfg_out.restrict_autolink; // Still no ideea what that is lmaooo
-  config["RestrictedSession"]["restrictMode"]     = cfg_out.restrict_mode;
-  config["RestrictedSession"]["timeoutSession"]   = cfg_out.restrict_timeout;
-  config["RestrictedSession"]["timeoutTimeSpan"]  = cfg_out.rescrict_time_span;
-  config["RemotePowerOptions"]["Port"]            = cfg_out.port;
-  config["RemotePowerOptions"]["socketCallbacks"] = cfg_out.power_opts_callbacks;
-
-// String concatenation to form the file path to the configuration file
-#if defined (_WIN32) || defined(_WIN64)
-  out_path << SPMUtils::GetHomeDir() << "\\.spm\\spm.conf";
+  
+  // Create json structure
+  json_out =
+  {
+    { "general",
+      {
+        { "deviceStatus",    cfg_out.dev_status_mpack     },
+        { "port",            cfg_out.port                 },
+        { "wolPort",         cfg_out.wol_port             },
+        { "socketCallbacks", cfg_out.power_opts_callbacks },
+        { "userFeedback",    cfg_out.user_feedback        }
+      }
+    },
+    { "debug",
+      {
+        { "stdoutLog", cfg_out.debug_log  },
+        { "msgbox",    cfg_out.msgbox_log }
+      }
+    },
+    { "restrictedSession",
+      {
+        { "enabled",  cfg_out.restrict_mode      },
+        { "timeout",  cfg_out.restrict_timeout   },
+        { "timespan", cfg_out.rescrict_time_span }
+      }
+    }
+  };
+  
+#if defined (_WIN32) || defined (_WIN64)
+  out_path << SPMUtils::GetHomeDir() << "\\.spm\\config.json";
 #endif
 
 #ifdef __linux__
-  out_path << SPMUtils::GetHomeDir() << "/.spm/spm.conf";
+  out_path << SPMUtils::GetHomeDir() << "/.spm/config.json";
 #endif
   
-  config.save(out_path.str()); // And save it with the file path and name formed earlier.
-  SPM_LOG(SPMDebug::Info, "Default config created");
-  //Do stuff here
+  
+  std::ofstream out_conf(out_path.str());
+  
+#ifndef SINGLE_LINE_CONFIG
+  out_conf << json_out.dump(4); // Write a human-readable json config
+#else
+  out_conf << json_out; // If enabled the entire config is written on a single line
+#endif
+  
 }
 
 SPMConfig::cfgStruct SPMConfig::Read()
 {
   cfgStruct cfg_in; // Configuration structure
-  ini::IniFile in_config;
-  std::ostringstream in_path;
-#ifdef __linux__
-  in_path << SPMUtils::GetHomeDir() << "/.spm/spm.conf"; // Create the file location of the config file
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-  in_path << SPMUtils::GetHomeDir() << "\\.spm\\spm.conf"; // Create the file location of the config file
-#endif
-
-  if(!SPMUtils::checkFile(in_path.str()))
-  {
-    SPM_LOG(SPMDebug::Err, "spm.conf not found !");
-  }
-  else
-  {
-    SPM_LOG(SPMDebug::Info, "Reading config...");
-    in_config.setMultiLineValues(true); // Allow the ini parser to load the sections and fields line by line
-
-    SPM_LOG(SPMDebug::noType, "Config path: ", in_path.str());
-
-    in_config.load(in_path.str()); // Then open the config file
-
-    cfg_in.debug_log          = in_config["Settings"]["dbgLog"].as<bool>();
-    cfg_in.pc_status_mpack    = in_config["Settings"]["pcStat"].as<bool>();
-    cfg_in.user_feedback      = in_config["Settings"]["usrFeedback"].as<bool>();
-    cfg_in.wolPort            = in_config["Settings"]["wolPort"].as<int>();
-    cfg_in.msgBox_log         = in_config["Settings"]["msgbox"].as<bool>();
-    cfg_in.rescrict_time_span = in_config["RestrictedSession"]["timeoutTimeSpan"].as<int>();
-    cfg_in.restrict_timeout   = in_config["RestrictedSession"]["timeoutSession"].as<bool>();
-    cfg_in.restrict_mode      = in_config["RestrictedSession"]["restrictMode"].as<bool>();
-    cfg_in.port               = in_config["RemotePowerOptions"]["Port"].as<int>();
-
-  }
-
+  std::ostringstream out_path;
+  
+  #if defined (_WIN32) || defined (_WIN64)
+    out_path << SPMUtils::GetHomeDir() << "\\.spm\\config.json";
+  #endif
+  
+  #ifdef __linux__
+    out_path << SPMUtils::GetHomeDir() << "/.spm/config.json";
+  #endif
+  
+  
+  std::ifstream in_conf(out_path.str());
+  
+  nlohmann::json json_in = nlohmann::json::parse(in_conf);
+  
+  // Parse json objects
+  nlohmann::json general_obj = json_in["general"];
+  
+  cfg_in.dev_status_mpack     = general_obj["deviceStatus"];
+  cfg_in.port                 = general_obj["port"];
+  cfg_in.wol_port             = general_obj["wolPort"];
+  cfg_in.power_opts_callbacks = general_obj["socketCallbacks"];
+  cfg_in.user_feedback        = general_obj["userFeedback"];
+  
+  
+  nlohmann::json debug_obj = json_in["debug"];
+  
+  cfg_in.debug_log  = debug_obj["stdoutLog"];
+  cfg_in.msgbox_log = debug_obj["msgbox"];
+  
+  
+  nlohmann::json restrictedSession_obj = json_in["restrictedSession"];
+  
+  cfg_in.restrict_mode      = restrictedSession_obj["enabled"];
+  cfg_in.restrict_timeout   = restrictedSession_obj["timeout"];
+  cfg_in.rescrict_time_span = restrictedSession_obj["timespan"];
+  
   return cfg_in;
 }

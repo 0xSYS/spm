@@ -121,6 +121,23 @@ bool SPMUtils::checkDir(std::string d)
   return (fileAttr != INVALID_FILE_ATTRIBUTES && !(fileAttr & FILE_ATTRIBUTE_DIRECTORY));
 #endif
  }
+ 
+ 
+void SPMUtils::printConfig(SPMConfig::cfgStruct c)
+{
+  std::cout << "Config structure:\n"
+  //<< "[BOOL] -> config_storage       = " << c.config_storage       << "\n"
+  << "[BOOL] -> dev_status_mpack     = " << c.dev_status_mpack     << "\n"
+  << "[BOOL] -> msgbox_log           = " << c.msgbox_log           << "\n"
+  << "[BOOL] -> debug_log            = " << c.debug_log            << "\n"
+  << "[BOOL] -> restrict_mode        = " << c.restrict_mode        << "\n"
+  << "[BOOL] -> restrict_timeout     = " << c.restrict_timeout     << "\n"
+  << "[BOOL] -> power_opts_callbacks = " << c.power_opts_callbacks << "\n"
+  << "[BOOL] -> user_feedback        = " << c.user_feedback        << "\n"
+  << "[INT]  -> rescrict_time_span   = " << c.rescrict_time_span   << "\n"
+  << "[INT]  -> port                 = " << c.port                 << "\n"
+  << "[INT]  -> wolPort              = " << c.wol_port             << "\n";
+}
 
 #if defined(_WIN32) || defined(_WIN64)
   void SPMUtils::SetWinTerm()
