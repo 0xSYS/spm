@@ -37,6 +37,7 @@ class SPM
 	static void CreateNewEnv(envInfo* e, int env_index);
 	static void RemoveEnv(int env_index); //This Does not remove the default environment
 	static void LoadEnv(int env_index);
+	static void UnloadEnv(int env_index);
 	static void SaveCustomLogFile(std::string f); // To do
 	static void LoadCustomDevList(std::string f);
 	static void SaveCustomDevList(std::string f);

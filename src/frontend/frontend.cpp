@@ -458,7 +458,7 @@ void MyFrame::CreateDeviceGrid() {
 		const wxPoint &  	pos = wxDefaultPosition,
 		const wxSize &  	size = wxDefaultSize,  */
     
-    devices = SPMList::ReadDevList();
+    devices = SPMList::Read(0);
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   
     deviceGrid = new wxGrid(this, wxID_ANY);
@@ -484,7 +484,7 @@ void MyFrame::CreateDeviceGrid() {
         deviceGrid->SetCellValue(i, 0, devices[i].name);
         deviceGrid->SetCellValue(i, 1, devices[i].os_ip);
         deviceGrid->SetCellValue(i, 2, devices[i].broadcast_ip);
-        deviceGrid->SetCellValue(i, 3, devices[i].mac_addr);
+        deviceGrid->SetCellValue(i, 3, devices[i].hw_addr);
         deviceGrid->SetCellValue(i, 5, devices[i].notes);
     }
 

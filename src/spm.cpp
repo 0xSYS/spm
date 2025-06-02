@@ -175,11 +175,11 @@ GOD DAMN
 
 
 #ifdef __linux__
-	mainDir << SPMUtils::GetHomeDir() << "/.spm/lists/main_list.sls";
+	mainDir << SPMUtils::GetHomeDir() << "/.spm/lists/devices.sls";
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-  mainDir << SPMUtils::GetHomeDir() << "\\.spm\\lists\\main_list.sls";
+  mainDir << SPMUtils::GetHomeDir() << "\\.spm\\lists\\devices.sls";
 #endif
 
 	SPM_LOG(SPMDebug::noType, "File path to list: ", mainDir.str());
@@ -308,7 +308,9 @@ void SPM::CheckEnv(int env_index)
   if(SPMUtils::checkFile(env_path.str()) == false)
 	{
 	  SPM_LOG(SPMDebug::Err, "Missing default env information");
+#ifndef NO_MSGBOX
 		SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing environment information !!!");
+#endif
 	}
 	else
 	{
@@ -324,7 +326,7 @@ void SPM::CreateNewEnv(envInfo* e, int env_index)
   bool allow_next_step = true;
   std::vector<bool> existing_env;
   
-  SPM_LOG(SPMDebug::Info, "Creating new environment. Index: ", env_index);
+  SPM_LOG(SPMDebug::Info, "Creating new environment with index: ", env_index);
   
 #ifdef __linux
   env_path << SPMUtils::GetHomeDir() << "/.spm/data/";
@@ -348,7 +350,9 @@ void SPM::CreateNewEnv(envInfo* e, int env_index)
   if(SPMUtils::checkDir(env_path.str()))
   {
     SPM_LOG(SPMDebug::Err, "env_", env_index , " Already exists !!!");
+#ifndef NO_MSGBOX
     SPMDebug::MsgBoxLog(SPMDebug::Err, "environment ", env_index, " Already exists !!!");
+#endif
     allow_next_step = false;
   }
   else
@@ -422,39 +426,58 @@ void SPM::RemoveEnv(int env_index)
     SPM_LOG(SPMDebug::Err, "Cannot remove env_0 !!! aka default environment");
   else
   {
+    bool success;
 
     // Check for these files
     // if one of them exists the env removal action is prevented
     std::ostringstream temp1;
-    temp1 << env_path.str() << "dev_list.sls";
+    temp1 << env_path.str() << "devices.sls";
     
     std::ostringstream temp2;
     temp2 << env_path.str() << "ip_table.sls";
     
     std::ostringstream temp3;
     temp3 << env_path.str() << "commands.sls";
+    std::ostringstream temp_str;
     if(SPMUtils::checkFile(temp1.str()))
     {
-      SPM_LOG(SPMDebug::Err, "dev_list.sls exists !!!");
+      temp_str << "devices.sls\n";
+      success = false;
     }
     else if(SPMUtils::checkFile(temp2.str()))
     {
-      SPM_LOG(SPMDebug::Err, "ip_table.sls exists !!!");
+      temp_str << "ip_table.sls\n";
+      success = false;
     }
     else if(SPMUtils::checkFile(temp3.str()))
     {
-      SPM_LOG(SPMDebug::Err, "commands.sls exists !!!");
+      temp_str << "commands.sls\n";
+      success = false;
     }
     else
     {
       // You can remove the env if none of these files exist
       env_path << "env_" << env_index;
       SPMUtils::removeDir(env_path.str());
+      success = true;
+    }
+    
+    if(!success)
+    {
+      SPM_LOG(SPMDebug::Err, "Failed to remove environment ", env_index, " due to existing files in it:\n", temp_str.str());
+#ifndef NO_MSGBOX
+      SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to remove environment ", env_index, " due to existing files in it:\n", temp_str.str());
+#endif
     }
   }
 }
 
 void SPM::LoadEnv(int env_index)
+{
+  // Todo
+}
+
+void SPM::UnloadEnv(int env_index)
 {
   // Todo
 }

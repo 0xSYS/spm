@@ -35,10 +35,6 @@
 
 
 
-/*
-Use Cases:
-Writig log files containing the date on the filename
-*/
 std::string SPMUtils::GetCurrentDate()
 {
   std::ostringstream temp;
@@ -48,6 +44,36 @@ std::string SPMUtils::GetCurrentDate()
   temp << std::put_time(&local_tm, "%d.%m.%Y");
   return temp.str();
 }
+
+std::string SPMUtils::genRandomHash(size_t len)
+{
+  std::string out_hash;
+  
+  const char charset[] =
+  "0123456789"
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  "abcdefghijklmnopqrstuvwxyz";
+  
+  const size_t max_index = (sizeof(charset) - 1);
+  
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dis(0, max_index - 1);
+  
+  for (size_t i = 0; i < len; ++i)
+  {
+    out_hash += charset[dis(gen)];
+  }
+  
+  return out_hash;
+}
+
+
+/*
+! - - - - - - - - - - - - - - !
+! File / Directory management !
+! - - - - - - - - - - - - - - !
+*/
 
 // The rest of the functions are crucial for managing files and directories
 std::string SPMUtils::GetHomeDir()
@@ -171,7 +197,6 @@ return r;
 
 bool SPMUtils::checkDir(std::string d)
 {
-  SPMDebug dbg;
 #ifdef __linux__
   struct stat s;
 
@@ -189,9 +214,8 @@ bool SPMUtils::checkDir(std::string d)
 #endif
 }
 
- bool SPMUtils::checkFile(std::string f)
- {
-   SPMDebug dbg;
+bool SPMUtils::checkFile(std::string f)
+{
 #ifdef __linux__
   struct stat buf;
 
@@ -211,7 +235,15 @@ bool SPMUtils::checkDir(std::string d)
   DWORD fileAttr = GetFileAttributesW(temp);
   return (fileAttr != INVALID_FILE_ATTRIBUTES && !(fileAttr & FILE_ATTRIBUTE_DIRECTORY));
 #endif
- }
+}
+
+
+
+/*
+! - - - !
+! Misc  !
+! - - - !
+*/
  
  
 void SPMUtils::printConfig(SPMConfig::cfgStruct c)
@@ -231,27 +263,23 @@ void SPMUtils::printConfig(SPMConfig::cfgStruct c)
   << "[INT]  -> last_env_index       = " << c.last_env_index       << "\n";
 }
 
-std::string SPMUtils::genRandomHash(size_t len)
+void SPMUtils::printDevArray(std::vector<SPMList::device> d)
 {
-  std::string out_hash;
-  
-  const char charset[] =
-  "0123456789"
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  "abcdefghijklmnopqrstuvwxyz";
-  
-  const size_t max_index = (sizeof(charset) - 1);
-  
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dis(0, max_index - 1);
-  
-  for (size_t i = 0; i < len; ++i)
+  int loop_index = 0;
+  for(const auto &dev : d)
   {
-    out_hash += charset[dis(gen)];
+    loop_index++;
+    std::cout << "[Loop Index]: " << loop_index
+    << "\n{\n"
+    << "    name: " << dev.name                     << ",\n"
+    << "    interface_type: " << dev.interface_type << ",\n"
+    << "    hw_address: " << dev.hw_addr            << ",\n"
+    << "    broadcast_ip: " << dev.broadcast_ip     << ",\n"
+    << "    os_ip: " << dev.os_ip                   << ",\n"
+    << "    notes: " << dev.notes                   << ",\n"
+    << "},\n";
+    
   }
-  
-  return out_hash;
 }
 
 #if defined(_WIN32) || defined(_WIN64)

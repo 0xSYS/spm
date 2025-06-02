@@ -4,6 +4,7 @@
 
 #include <string>
 #include "config.hpp"
+#include "spm_list.hpp"
 
 
 
@@ -20,6 +21,7 @@ class SPMUtils
   static bool checkFile(std::string f);
   static bool ping(const std::string & ip);
   static void printConfig(SPMConfig::cfgStruct c);
+  static void printDevArray(std::vector<SPMList::device> d);
   static std::string genRandomHash(size_t len);
 #if defined(_WIN32) || defined(_WIN64)
   static void SetWinTerm();

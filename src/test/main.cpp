@@ -72,11 +72,11 @@ void Test6()
 
 void Test7()
 {
-	std::vector<SPMList::device> someList = SPMList::ReadDevList();
+	std::vector<SPMList::device> someList = SPMList::Read(0);
 
 	for(int i = 0; i < someList.size(); i++)
 	{
-		std::cout << someList[i].name << " " << someList[i].broadcast_ip << " " << someList[i].broadcast_ip << " " << someList[i].mac_addr << "\n";
+		std::cout << someList[i].name << " " << someList[i].broadcast_ip << " " << someList[i].broadcast_ip << " " << someList[i].hw_addr << "\n";
 
 	}
 }
@@ -144,6 +144,25 @@ void Test13()
   SPM::RemoveEnv(2);
 }
 
+void Test14()
+{
+  std::vector<SPMList::device> some_list;
+  some_list.push_back({"Pentium Dual Core", "default", "1c:6f:65:c2:e8:2f", "192.168.1.255", "192.168.1.102", "Just a simple demo"});
+  some_list.push_back({"Core Duo E8400", "default", "6c:f0:49:a1:d9:e6", "192.168.1.255", "192.168.1.33", "The computher that dosen't have an SSD anymore lmao"});
+  some_list.push_back({"NotExistingServer", "ipmi", "the:bmc:addr", "192.168.1.255", "192.168.1.54", "This is how a server would be stored"});
+  
+  SPMList::Write(0, some_list);
+}
+
+void Test15()
+{
+  std::vector<SPMList::device> parsed_list;
+  
+  parsed_list = SPMList::Read(0);
+  
+  SPMUtils::printDevArray(parsed_list);
+}
+
 
 int main(int argc, char * argv[])
 {
@@ -159,7 +178,9 @@ int main(int argc, char * argv[])
   // Test9();
   // Test10();
   // Test11();
-  Test12();
+  // Test12();
   // Test13();
+  // Test14();
+  Test15();
 	return 0;
 }

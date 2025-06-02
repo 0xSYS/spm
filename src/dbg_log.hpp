@@ -250,7 +250,7 @@ class SPMDebug
       out_log_init.close();
     }
   }
-  template<typename T, typename... Args >
+  template<typename T, typename... Args>
   static void MsgBoxLog(int logType, T mainStr, Args... r)
   {
     std::ostringstream text;

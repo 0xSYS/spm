@@ -19,9 +19,10 @@ A set software components designed for managing computers / servers with support
 
 * Features
 - [X] Basic wake on lan function
-- [ ] Power off along side wake on lan via server listener (In progress)
+- [X] Device list
+- [X] Power off along side wake on lan via server listener (In progress)
 - [ ] Automatic detection of avaialble computers / servers (Works only on windows)
-- [ ] Storage environment
+- [ ] Storage environment (In progress)
 - [ ] Power Status Check
 - [ ] Frontend GUI (Already in rpogress)
 - [ ] Restricted session
