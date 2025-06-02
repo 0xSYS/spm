@@ -5,7 +5,6 @@
 
 
 #include <sstream>
-// fuck you #include <inifile-cpp/inicpp.h>
 
 
 #include "dbg_log.hpp"

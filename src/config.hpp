@@ -32,7 +32,7 @@ class SPMConfig
       std::string restr_list_path;          // Set custom path for the encrypted pc list
       int usr_index;                        // Maps all users that can run in restricted mode with a number (usr1, usr2)
       int port;                             // Set custom port for poweroff / reboot packets
-      int wol_port;                          // Set different port for wake on lan
+      int wol_port;                         // Set different port for wake on lan
       std::vector<std::string> restr_users; // Store all users that can enter restricted mode
 	  }cfgStruct;
 	static void Write(cfgStruct);

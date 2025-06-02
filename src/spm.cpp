@@ -289,35 +289,37 @@ void SPM::CreateDefaultEnv()
   out_env_info.close();
 }
 
-void SPM::CheckDefaultEnv()
+void SPM::CheckEnv(int env_index)
 {
   std::ostringstream env_path;
   
 #ifdef __linux__  
-  env_path << SPMUtils::GetHomeDir() << "/.spm/data/env_0/";
+  env_path << SPMUtils::GetHomeDir() << "/.spm/data/";
+  env_path << "env_" << env_index << "/info.spmenv";
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-  env_path << SPMUtils::GetHomeDir() << "\\.spm\\data\\env_0\\";
+  env_path << SPMUtils::GetHomeDir() << "\\.spm\\data\\";
+  env_path << "env_" << env_index << "\\info.spmenv";
 #endif
 
-  env_path << "info.spmenv";
+  //env_path << "env" << "info.spmenv";
   std::cout << "env_path: " << env_path.str() << "\n";
   if(SPMUtils::checkFile(env_path.str()) == false)
 	{
 	  SPM_LOG(SPMDebug::Err, "Missing default env information");
-		SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing default environment information !!!");
+		SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing environment information !!!");
 	}
 	else
 	{
-	  SPM_LOG(SPMDebug::Success, "Default environment info found !");
+	  SPM_LOG(SPMDebug::Success, "Environment info found !");
 	}
-  
 }
 
-void SPM::CreateNewEnv(int env_index)
+void SPM::CreateNewEnv(envInfo* e, int env_index)
 {
   std::ostringstream env_path;
+  std::ostringstream env_name;
   nlohmann::json env_info;
   bool allow_next_step = true;
   std::vector<bool> existing_env;
@@ -357,12 +359,32 @@ void SPM::CreateNewEnv(int env_index)
   if(allow_next_step)
   {
     SPMUtils::makeDir(env_path.str());
+    
+    // this feels kinda meh
+    if(e == nullptr)
+    {
+      e = new envInfo();
+      env_name << "env_" << env_index;
+      e->name = env_name.str();
+      e->description = "";
+    }
+    else
+    {
+      if(e->name.empty())
+      {
+        env_name.str("");
+        env_name.clear();
+        env_name << "env_" << env_index;
+        e->name = env_name.str();
+      }
+    }
    
     // Create a small binary encoded json file containing minimal information about the created storage environment
     env_info =
     {
       { "dateCreated", SPMUtils::GetCurrentDate() },
-      { "description", "The default storage environment for spm" },
+      { "name", e->name },
+      { "description", e->description },
       { "uniqueIdentifier", SPMUtils::genRandomHash(16) /*give it a random hash made out of 16 characters to avoid confusion in between multiple default storage environments*/ },
       { "index", env_index }
     };
@@ -430,6 +452,11 @@ void SPM::RemoveEnv(int env_index)
       SPMUtils::removeDir(env_path.str());
     }
   }
+}
+
+void SPM::LoadEnv(int env_index)
+{
+  // Todo
 }
 
 void SPM::Terminate()

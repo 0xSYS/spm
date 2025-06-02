@@ -114,24 +114,34 @@ void Test11()
 {
   std::cout << "Test11() -> default Env check testing\n";
   
-  SPM::CheckDefaultEnv();
+  SPM::CheckEnv(1);
+  SPM::CheckEnv(2);
 }
 
 void Test12()
 {
   std::cout << " Test12() -> CreateNewEnv()\n";
-  SPM::CreateNewEnv(1);
-  SPM::CreateNewEnv(2);
-  //SPM::CreateNewEnv(3);
-  //SPM::CreateNewEnv(4);
+  
+  SPM::envInfo e1;
+  e1.name = "Idk Some name here";
+  e1.description = "Some simple struct testing lol";
+  
+  SPM::envInfo e2;
+  e2.name = "Another env ghgg";
+  e2.description = "Things seems to be working just fine.";
+  
+  SPM::CreateNewEnv(nullptr, 1);
+  SPM::CreateNewEnv(nullptr, 2);
+  SPM::CreateNewEnv(&e1, 3);
+  SPM::CreateNewEnv(&e2, 4);
 }
 
 void Test13()
 {
   std::cout << "Test13() -> RemoveEnv()\n";
   
-  SPM::RemoveEnv(0);
-  //SPM::RemoveEnv(2);
+  SPM::RemoveEnv(1);
+  SPM::RemoveEnv(2);
 }
 
 
@@ -149,7 +159,7 @@ int main(int argc, char * argv[])
   // Test9();
   // Test10();
   // Test11();
-  // Test12();
-  Test13();
+  Test12();
+  // Test13();
 	return 0;
 }
