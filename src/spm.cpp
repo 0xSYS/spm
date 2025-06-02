@@ -175,11 +175,11 @@ GOD DAMN
 
 
 #ifdef __linux__
-	mainDir << SPMUtils::GetHomeDir() << "/.spm/lists/devices.sls";
+	mainDir << SPMUtils::GetHomeDir() << "/.spm/lists/devices.spmls";
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
-  mainDir << SPMUtils::GetHomeDir() << "\\.spm\\lists\\devices.sls";
+  mainDir << SPMUtils::GetHomeDir() << "\\.spm\\lists\\devices.spmls";
 #endif
 
 	SPM_LOG(SPMDebug::noType, "File path to list: ", mainDir.str());
@@ -213,7 +213,7 @@ void SPM::CreateDefaultEnv()
   Example: env_0 (the default), env_1, env_2, env_3, ...
   
   - Checks for .spm/data/env_0 (The default environment). If not existing it creates the env_0 directory
-  env_0, env_1, ... holds info.spmenv, dev_list.sls, ip_table.sls (.sls = Spm LiSt)
+  env_0, env_1, ... holds info.spmenv, devices.spmls, devices.spmls (.spmls = Spm LiSt)
   
   - Creates the info.spmenv file (Very important file when synchronizing the environment from desktop to mobile)
   */
@@ -431,27 +431,27 @@ void SPM::RemoveEnv(int env_index)
     // Check for these files
     // if one of them exists the env removal action is prevented
     std::ostringstream temp1;
-    temp1 << env_path.str() << "devices.sls";
+    temp1 << env_path.str() << "devices.spmls";
     
     std::ostringstream temp2;
-    temp2 << env_path.str() << "ip_table.sls";
+    temp2 << env_path.str() << "ip_table.spmls";
     
     std::ostringstream temp3;
-    temp3 << env_path.str() << "commands.sls";
+    temp3 << env_path.str() << "commands.spmls";
     std::ostringstream temp_str;
     if(SPMUtils::checkFile(temp1.str()))
     {
-      temp_str << "devices.sls\n";
+      temp_str << "devices.spmls\n";
       success = false;
     }
     else if(SPMUtils::checkFile(temp2.str()))
     {
-      temp_str << "ip_table.sls\n";
+      temp_str << "ip_table.spmls\n";
       success = false;
     }
     else if(SPMUtils::checkFile(temp3.str()))
     {
-      temp_str << "commands.sls\n";
+      temp_str << "commands.spmls\n";
       success = false;
     }
     else

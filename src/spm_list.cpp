@@ -28,7 +28,7 @@ std::vector <SPMList::device> SPMList::Read(int env_index)
 
   if(SPMUtils::checkDir(file_path.str()))
   {
-    file_path << "devices.sls";
+    file_path << "devices.spmls";
     if(SPMUtils::checkFile(file_path.str()))
     {
       // Read an array of json objects
@@ -36,9 +36,9 @@ std::vector <SPMList::device> SPMList::Read(int env_index)
       
       if(!in_file)
       {
-        SPM_LOG(SPMDebug::Err, "Failed to open devices.sls from environment ", env_index, " !!!");
+        SPM_LOG(SPMDebug::Err, "Failed to open devices.spmls from environment ", env_index, " !!!");
 #ifndef NO_MSGBOX
-        SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to open devices.sls from environment ", env_index , " !!!");
+        SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to open devices.spmls from environment ", env_index , " !!!");
 #endif
       }
       else
@@ -62,9 +62,9 @@ std::vector <SPMList::device> SPMList::Read(int env_index)
     }
     else
     {
-      SPM_LOG(SPMDebug::Err, "Missing devices.sls from environment ", env_index);
+      SPM_LOG(SPMDebug::Err, "Missing devices.spmls from environment ", env_index);
 #ifndef NO_MSGBOX
-      SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing devices.sls from environment ", env_index);
+      SPMDebug::MsgBoxLog(SPMDebug::Err, "Missing devices.spmls from environment ", env_index);
 #endif
     }
   }
@@ -99,7 +99,7 @@ void SPMList::Write(int env_index, std::vector<device> l)
 
   if(SPMUtils::checkDir(file_path.str()))
   {
-    file_path << "devices.sls";
+    file_path << "devices.spmls";
     // Do the list writing
     int dev_index = 0;
     for(const auto& dev : l)
