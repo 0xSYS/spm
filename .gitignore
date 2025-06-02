@@ -3,6 +3,7 @@
 build/
 src/temp.txt
 src/temp2.txt
+src/.ignore
 src/.cache/*
 # MacOS Cache
 .DS_Store
