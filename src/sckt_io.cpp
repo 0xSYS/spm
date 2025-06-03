@@ -10,6 +10,7 @@
 #endif
 
 
+
 #ifdef _WIN32
   #define WIN32_LEAN_AND_MEAN
   #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -29,6 +30,7 @@
 
 #include <cstring>
 #include <chrono>
+#include <thread>
 
 
 #include "sckt_io.hpp"
@@ -64,76 +66,148 @@ unsigned short checksum(void *b, int len)
   return result;
 }
 
-bool SPM_SocketIO::ping(std::string i)
+bool SPM_SocketIO::ping(int count, std::string ip)
 {
   int sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if(sockfd < 0)
   {
-    //perror("Socket error");
-    char temp_msrgerr[256];
-    strerror_r(errno, temp_msrgerr, sizeof(temp_msrgerr));
-    SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", temp_msrgerr);
+    SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", SPMUtils::getErr());
     return false;
   }
 
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = inet_addr(i.c_str());
+  addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
-  // ICMP header
   struct icmphdr icmp_hdr;
   icmp_hdr.type = ICMP_ECHO;
   icmp_hdr.code = 0;
   icmp_hdr.un.echo.id = getpid();
-  icmp_hdr.un.echo.sequence = 1;
-  icmp_hdr.checksum = 0;
-  icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
 
-  auto start = std::chrono::high_resolution_clock::now();
-
-  if(sendto(sockfd, &icmp_hdr, sizeof(icmp_hdr), 0, (struct sockaddr*)&addr, sizeof(addr)) <= 0)
+  int replies = 0;
+  
+  if(count == 0)
   {
-    char temp_msrgerr[256];
-    strerror_r(errno, temp_msrgerr, sizeof(temp_msrgerr));
-    SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", temp_msrgerr);
-    close(sockfd);
-    return false;
-  }
-
-  // Wait for reply
-  char buf[1024];
-  struct sockaddr_in r_addr;
-  socklen_t len = sizeof(r_addr);
-
-  fd_set readfds;
-  FD_ZERO(&readfds);
-  FD_SET(sockfd, &readfds);
-
-  struct timeval timeout;
-  timeout.tv_sec = 1; // 1 second timeout
-  timeout.tv_usec = 0;
-
-  int ret = select(sockfd + 1, &readfds, NULL, NULL, &timeout);
-  if(ret > 0 && FD_ISSET(sockfd, &readfds))
-  {
-    int bytes = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*)&r_addr, &len);
-    if(bytes > 0)
+    SPM_LOG(SPMDebug::Info, "Infinite pinging.");
+    int seq = 0;
+    while(true)
     {
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double, std::milli> elapsed = end - start;
-      SPM_LOG(SPMDebug::Err, "Got reply from ", i, "in ", elapsed.count(), " ms");
-      close(sockfd);
-      return true;
+      icmp_hdr.un.echo.sequence = seq;
+      icmp_hdr.checksum = 0;
+      icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
+  
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+  
+      auto start = std::chrono::high_resolution_clock::now();
+  
+      if(sendto(sockfd, &icmp_hdr, sizeof(icmp_hdr), 0, (struct sockaddr*)&addr, sizeof(addr)) <= 0)
+      {
+        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getErr());
+        continue; // Don't return, try next ping
+      }
+  
+      // Wait for reply
+      char buf[1024];
+      struct sockaddr_in r_addr;
+      socklen_t len = sizeof(r_addr);
+  
+      fd_set readfds;
+      FD_ZERO(&readfds);
+      FD_SET(sockfd, &readfds);
+  
+      struct timeval timeout;
+      timeout.tv_sec = 1; // 1 second timeout
+      timeout.tv_usec = 0;
+  
+      int ret = select(sockfd + 1, &readfds, NULL, NULL, &timeout);
+      if(ret > 0 && FD_ISSET(sockfd, &readfds))
+      {
+        int bytes = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*)&r_addr, &len);
+        if (r_addr.sin_addr.s_addr != addr.sin_addr.s_addr)
+        {
+          // Not from the host we are pinging, ignore
+          continue;
+        }
+        if(bytes > 0)
+        {
+          auto end = std::chrono::high_resolution_clock::now();
+          std::chrono::duration<double, std::milli> elapsed = end - start;
+#ifdef ANSI_ESCAPES
+          SPM_LOG(SPMDebug::Success, "seq: ", seq+1, " | Got reply from \033[38;5;214m", ip, "\033[0m in ", elapsed.count(), " ms");
+#else
+          SPM_LOG(SPMDebug::Success, "seq: ", seq+1, " | Got reply from ", ip, " in ", elapsed.count(), " ms");
+#endif
+          replies++;
+        }
+      }
+      else
+      {
+        SPM_LOG(SPMDebug::Err, "Request timed out !! | seq: ", seq);
+      }
+      seq++;
     }
   }
   else
   {
-    //std::cout << "Request timed out.\n";
-    SPM_LOG(SPMDebug::Err, "Request timed out !!");
+    for(int j = 0; j < count; j++)
+    {
+      icmp_hdr.un.echo.sequence = j + 1;
+      icmp_hdr.checksum = 0;
+      icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
+
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+
+      auto start = std::chrono::high_resolution_clock::now();
+
+      if(sendto(sockfd, &icmp_hdr, sizeof(icmp_hdr), 0, (struct sockaddr*)&addr, sizeof(addr)) <= 0)
+      {
+        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getErr());
+        continue; // Don't return, try next ping
+      }
+
+      // Wait for reply
+      char buf[1024];
+      struct sockaddr_in r_addr;
+      socklen_t len = sizeof(r_addr);
+
+      fd_set readfds;
+      FD_ZERO(&readfds);
+      FD_SET(sockfd, &readfds);
+
+      struct timeval timeout;
+      timeout.tv_sec = 1; // 1 second timeout
+      timeout.tv_usec = 0;
+
+      int ret = select(sockfd + 1, &readfds, NULL, NULL, &timeout);
+      if(ret > 0 && FD_ISSET(sockfd, &readfds))
+      {
+        int bytes = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*)&r_addr, &len);
+        if(r_addr.sin_addr.s_addr != addr.sin_addr.s_addr)
+        {
+          // Not from the host we are pinging, ignore
+          continue;
+        }
+        if(bytes > 0)
+        {
+          auto end = std::chrono::high_resolution_clock::now();
+          std::chrono::duration<double, std::milli> elapsed = end - start;
+#ifdef ANSI_ESCAPES
+          SPM_LOG(SPMDebug::Success, "seq: ", j+1, " / ", count, " | Got reply from \033[38;5;214m", ip, "\033[0m in ", elapsed.count(), " ms");
+#else
+          SPM_LOG(SPMDebug::Success, "seq: ", j+1, " / ", count, " | Got reply from ", ip, " in ", elapsed.count(), " ms");
+#endif
+          replies++;
+        }
+      }
+      else
+      {
+        SPM_LOG(SPMDebug::Err, "Request timed out !! | seq: ", j+1);
+      }
+    }
   }
 
   close(sockfd);
-  return false;
+  return replies > 0; // Return true if at least one reply was received
 }
 
 void SPM_SocketIO::SndPowerAction(int actType, std::string target)

@@ -282,6 +282,19 @@ void SPMUtils::printDevArray(std::vector<SPMList::device> d)
   }
 }
 
+char * SPMUtils::getErr()
+{
+  char buf[256];
+  char* msg;
+#if((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE)
+  strerror_r(errno, temp_msrgerr, sizeof(temp_msrgerr));
+  msg = buf;
+#else
+  msg = strerror_r(errno, buf, sizeof(buf));
+#endif
+  return msg;
+}
+
 #if defined(_WIN32) || defined(_WIN64)
   void SPMUtils::SetWinTerm()
   {

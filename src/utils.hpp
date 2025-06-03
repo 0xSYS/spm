@@ -22,6 +22,7 @@ class SPMUtils
   static bool ping(const std::string & ip);
   static void printConfig(SPMConfig::cfgStruct c);
   static void printDevArray(std::vector<SPMList::device> d);
+  static char * getErr();
   static std::string genRandomHash(size_t len);
 #if defined(_WIN32) || defined(_WIN64)
   static void SetWinTerm();

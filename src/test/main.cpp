@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 
 
@@ -10,7 +12,6 @@
 #include "../dev_detect.hpp"
 #include "../utils.hpp"
 #include "../dbg_log.hpp"
-//#include "../globals.hpp"
 #include "../spm_list.hpp"
 #include "../sckt_io.hpp"
 
@@ -163,6 +164,17 @@ void Test15()
   SPMUtils::printDevArray(parsed_list);
 }
 
+void Test16()
+{
+  SPM_SocketIO::ping(0, "192.168.1.15");
+}
+
+void Test17()
+{
+  SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
+  SPM_SocketIO::ping(90, "192.168.1.102");
+}
+
 
 int main(int argc, char * argv[])
 {
@@ -180,7 +192,9 @@ int main(int argc, char * argv[])
   // Test11();
   // Test12();
   // Test13();
-  Test14();
+  // Test14();
   // Test15();
+  // Test16();
+  // Test17();
 	return 0;
 }
