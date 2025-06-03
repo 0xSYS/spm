@@ -41,7 +41,10 @@ class SPM
 	static void LoadCustomDevList(std::string f);
 	static void SaveCustomDevList(std::string f);
 	static void ReloadDevList();
-	static void CheckPowerStat();
+	static void CheckPowerStat(SPMList::device d);
+	static void ServerWake(SPMList::device d);
+	static void ServerSleep(SPMList::device d);
+	static void ServerStandby(SPMList::device d);
 	static void Terminate();
 };
 
