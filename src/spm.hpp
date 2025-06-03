@@ -12,7 +12,6 @@
 
 
 
-
 inline SPMConfig::cfgStruct globalConf;
 
 class SPM
@@ -42,5 +41,10 @@ class SPM
 	static void LoadCustomDevList(std::string f);
 	static void SaveCustomDevList(std::string f);
 	static void ReloadDevList();
+	static void CheckPowerStat();
 	static void Terminate();
 };
+
+
+inline std::vector<SPM::envInfo> loaded_envs;
+inline std::vector<SPMList::device> loaded_dev_list;

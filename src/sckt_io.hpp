@@ -46,6 +46,7 @@ class SPM_SocketIO
     ForceReboot
   };
   
+    static bool ping(std::string i);
     static void SndPowerAction(int actType, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
