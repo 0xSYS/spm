@@ -66,7 +66,7 @@ unsigned short checksum(void *b, int len)
   return result;
 }
 
-bool SPM_SocketIO::ping(int count, std::string ip)
+bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 {
   int sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if(sockfd < 0)
@@ -86,6 +86,12 @@ bool SPM_SocketIO::ping(int count, std::string ip)
 
   int replies = 0;
   
+  if(delay <= 0)
+  {
+    SPM_LOG(SPMDebug::Err, "Delay cannot be 0 or smaller than 0 !!! | Delay set to 1 sec.");
+    delay = 1;
+  }
+  
   if(count == 0)
   {
     SPM_LOG(SPMDebug::Info, "Infinite pinging.");
@@ -96,7 +102,7 @@ bool SPM_SocketIO::ping(int count, std::string ip)
       icmp_hdr.checksum = 0;
       icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
   
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(std::chrono::seconds(delay));
   
       auto start = std::chrono::high_resolution_clock::now();
   
@@ -155,7 +161,7 @@ bool SPM_SocketIO::ping(int count, std::string ip)
       icmp_hdr.checksum = 0;
       icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
 
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(std::chrono::seconds(delay));
 
       auto start = std::chrono::high_resolution_clock::now();
 
@@ -207,6 +213,7 @@ bool SPM_SocketIO::ping(int count, std::string ip)
   }
 
   close(sockfd);
+  
   return replies > 0; // Return true if at least one reply was received
 }
 
@@ -255,18 +262,32 @@ void SPM_SocketIO::SndPowerAction(int actType, std::string target)
         if(actType == 1)
         {
           send(sckt, "pwroff", strlen("pwroff"), 0);
+          SPM_LOG(SPMDebug::Info, "Poweroff sent to ", target);
         }
         else if(actType == 2)
         {
           send(sckt, "fpwroff", strlen("fpwroff"), 0);
+          SPM_LOG(SPMDebug::Warn, "Forced Poweroff sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
         }
         else if(actType == 3)
         {
           send(sckt, "rbt", strlen("rbt"), 0);
+          SPM_LOG(SPMDebug::Info, "Reboot sent to ", target);
         }
         else if(actType == 4)
         {
           send(sckt, "frbt", strlen("frbt"), 0);
+          SPM_LOG(SPMDebug::Warn, "Forced Reboot sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
+        }
+        else if(actType == 5)
+        {
+          send(sckt, "stby", strlen("stby"), 0);
+          SPM_LOG(SPMDebug::Info, "Standby sent to ", target);
+        }
+        else if(actType == 6)
+        {
+          send(sckt, "fstby", strlen("fstby"), 0);
+          SPM_LOG(SPMDebug::Info, "Forced Standby sent to ", target);
         }
         close(sckt);
       }

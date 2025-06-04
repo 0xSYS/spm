@@ -5,6 +5,8 @@
 
 #include <string>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 
 
@@ -43,10 +45,12 @@ class SPM_SocketIO
     Poweroff = 1,
     ForcePoweroff, // The forced power actions should be avoided from being used as they can cause system corruptions if not handeled carefully
     Reboot,
-    ForceReboot
+    ForceReboot,
+    Standby,
+    ForceStandby
   };
   
-    static bool ping(int count, std::string ip);
+    static bool ping(int count, int delay, std::string ip);
     static void SndPowerAction(int actType, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
