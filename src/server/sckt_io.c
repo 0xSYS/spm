@@ -4,6 +4,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <errno.h>
 
 
 
@@ -26,9 +27,9 @@
 
 config SettingsUnpack(char s[])
 {
-  config cfg;
-  char * str_ptr;
-  char * tok;
+  config cfg = {0}; // Zero-initialize all fields
+  char *str_ptr;
+  char *tok;
 
   int packetSz = strlen(s);
   if(packetSz == 0)
@@ -43,8 +44,8 @@ config SettingsUnpack(char s[])
     {
       if(strncmp(tok, "dbgLog=", 7) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 7, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -53,8 +54,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok, "scktResp=", 9) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 9, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -63,8 +64,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok, "allowSysInfo=", 13) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 13, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -73,8 +74,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok, "skipProcScan=", 13) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 13, &end_ptr, 10);
         if(errno == 0 && * end_ptr == '\0')
         {
@@ -83,8 +84,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok , "terminateProcesses=", 18) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 18, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -93,8 +94,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok , "stdoutCapture=", 14) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 14, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -103,8 +104,8 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok, "writeLogFiles=", 14) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 14, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
@@ -113,14 +114,16 @@ config SettingsUnpack(char s[])
       }
       else if(strncmp(tok, "port=", 5) == 0)
       {
+        errno = 0;
         char * end_ptr;
-        int errno = 0;
         long tmp = strtol(tok + 5, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
           cfg.port = (int)tmp;
         }
       }
+      // Advance to next token!
+      tok = strtok_r(NULL, " ", &str_ptr);
     }
   }
   return cfg;
