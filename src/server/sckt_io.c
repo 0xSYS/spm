@@ -188,17 +188,27 @@ void StartScktReception()
   }
 
   // Accept a connection
+  while(1)
+  {
   sckt = accept(serv_fd, (struct sockaddr *)&addr, (socklen_t *)&addrlen);
   if(sckt < 0)
   {
     Log(Err, "Failed to accept connection !!");
     perror("accept");
-    exit(EXIT_FAILURE);
+    //exit(EXIT_FAILURE);
+    continue;
   }
 
   // Read data
-  read(sckt, buffer, 1024);
-  Log(Info, "Recevied socket msg: %s\n", buffer);
+  memset(buffer, 0, sizeof(buffer)); // Clear buffer before reading
+          int n = read(sckt, buffer, sizeof(buffer) - 1);
+          if (n <= 0) {
+              close(sckt);
+              continue;
+          }
+          buffer[n] = '\0'; // Null-terminate
+  
+          Log(Info, "Received socket msg: %s\n", buffer);
 
   if(strcmp(buffer, "pwroff") == 0)
   {
@@ -250,7 +260,10 @@ void StartScktReception()
   }
   else if(strcmp(buffer, "killServ") == 0)
   {
-    close(sckt);
-    close(serv_fd);
+    //close(sckt);
+    //close(serv_fd);
   }
+  close(sckt);
+  }
+  close(serv_fd);
 }
