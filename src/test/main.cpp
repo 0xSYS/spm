@@ -166,7 +166,7 @@ void Test15()
 
 void Test16()
 {
-  SPM_SocketIO::ping(10, 0, "192.168.1.102");
+  SPM_SocketIO::ping(10, 1, "192.168.1.102");
 }
 
 void Test17()
@@ -175,6 +175,23 @@ void Test17()
   SPM_SocketIO::ping(90, 1, "192.168.1.102");
 }
 
+
+void SomeFn(int &n)
+{
+  n += 5;
+}
+
+
+void Test18()
+{
+  int num = 5;
+  
+  SomeFn(num);
+  
+  std::cout << "Modified stuff: " << num << "\n";
+  
+  
+}
 
 int main(int argc, char * argv[])
 {
@@ -196,5 +213,6 @@ int main(int argc, char * argv[])
   // Test15();
   // Test16();
   // Test17();
+  // Test18();
 	return 0;
 }

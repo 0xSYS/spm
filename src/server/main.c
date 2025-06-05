@@ -11,11 +11,11 @@
 
 void TestingStuff()
 {
-    // sdfadsfd
-    Log(Info, "Info Log");
-    Log(Success, "Success Log");
-    Log(Warn, "Warn Log");
-    Log(Err, "Error Log");
+  // sdfadsfd
+  Log(Info, "Info Log");
+  Log(Success, "Success Log");
+  Log(Warn, "Warn Log");
+  Log(Err, "Error Log");
 }
 
 
@@ -23,8 +23,8 @@ void TestingStuff()
 int main(int argc, char * argv[])
 {
     // Do stuff here
-    TestingStuff();
-    StartScktReception();
+  TestingStuff();
+  StartScktReception();
     /*
     CheckRuningProc("helix");
     CheckRuningProc("zsh");
