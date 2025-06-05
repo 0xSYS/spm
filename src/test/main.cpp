@@ -207,6 +207,11 @@ void Test19()
   SPM_SocketIO::SndCustomSettings("192.168.1.102", mySettings);
 }
 
+void Test20()
+{
+  SPM_SocketIO::SndKillServer("192.168.1.102");
+}
+
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
@@ -228,6 +233,7 @@ int main(int argc, char * argv[])
   // Test16();
   // Test17();
   // Test18();
-  Test19();
+  // Test19();
+  Test20();
 	return 0;
 }

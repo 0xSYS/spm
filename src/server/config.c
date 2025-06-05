@@ -19,8 +19,8 @@ config current_conf;
 
 config ReadConfig()
 {
+  Log(Info, "Reading config");
   config res_conf;
-  Log(Info, "Directory path: %s", dir_path);
   FILE * in_file = fopen(dir_path, "r");
   
   if(!in_file)
@@ -49,13 +49,13 @@ config ReadConfig()
     else
     {
       const cJSON *allow_sys_info = cJSON_GetObjectItemCaseSensitive(root, "allowSystemInfo");
-      const cJSON *dbg_log = cJSON_GetObjectItemCaseSensitive(root, "debugLog");
+      const cJSON *dbg_log        = cJSON_GetObjectItemCaseSensitive(root, "debugLog");
       const cJSON *write_log_file = cJSON_GetObjectItemCaseSensitive(root, "writeLogFile");
       const cJSON *skip_proc_scan = cJSON_GetObjectItemCaseSensitive(root, "skipProcessScanning");
-      const cJSON *term_proc = cJSON_GetObjectItemCaseSensitive(root, "terminateProcs");
-      const cJSON *stdout_capt = cJSON_GetObjectItemCaseSensitive(root, "stdoutCapture");
-      const cJSON *sock_resp = cJSON_GetObjectItemCaseSensitive(root, "socketResponse");
-      const cJSON *port = cJSON_GetObjectItemCaseSensitive(root, "port");
+      const cJSON *term_proc      = cJSON_GetObjectItemCaseSensitive(root, "terminateProcs");
+      const cJSON *stdout_capt    = cJSON_GetObjectItemCaseSensitive(root, "stdoutCapture");
+      const cJSON *sock_resp      = cJSON_GetObjectItemCaseSensitive(root, "socketResponse");
+      const cJSON *port           = cJSON_GetObjectItemCaseSensitive(root, "port");
       
       if(cJSON_IsBool(allow_sys_info))
       {
@@ -101,23 +101,23 @@ config ReadConfig()
       free(in_conf_str);
     }
   }
-	// gregreg
 	return res_conf;
 }
 
 void WriteConfig(config cfg)
 {
+  Log(Info, "Writing config");
 	cJSON *root = cJSON_CreateObject();
 	
 	// Constructing a simple json structure
-  cJSON_AddBoolToObject(root, "allowSystemInfo", cfg.allow_sys_info);
-  cJSON_AddBoolToObject(root, "debugLog", cfg.dbg_log);
-  cJSON_AddBoolToObject(root, "writeLogFile", cfg.write_log_file);
+  cJSON_AddBoolToObject(root, "allowSystemInfo",     cfg.allow_sys_info);
+  cJSON_AddBoolToObject(root, "debugLog",            cfg.dbg_log);
+  cJSON_AddBoolToObject(root, "writeLogFile",        cfg.write_log_file);
   cJSON_AddBoolToObject(root, "skipProcessScanning", cfg.skip_proc_scan);
-  cJSON_AddBoolToObject(root, "terminateProcs", cfg.terminate_processes);
-  cJSON_AddBoolToObject(root, "stdoutCapture", cfg.stdout_capture);
-  cJSON_AddBoolToObject(root, "socketResponse", cfg.socket_response);
-  cJSON_AddNumberToObject(root, "port", cfg.port);
+  cJSON_AddBoolToObject(root, "terminateProcs",      cfg.terminate_processes);
+  cJSON_AddBoolToObject(root, "stdoutCapture",       cfg.stdout_capture);
+  cJSON_AddBoolToObject(root, "socketResponse",      cfg.socket_response);
+  cJSON_AddNumberToObject(root, "port",              cfg.port);
   
   char *json_string = cJSON_Print(root);
   

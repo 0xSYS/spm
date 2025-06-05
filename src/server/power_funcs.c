@@ -27,13 +27,12 @@ void SysPowerOff()
 
   if (r < 0)
   {
-	  Log(Err, "Failed to execute poweroff: %s\n", error.message);
+	  Log(Err, "Failed to execute PowerOff: %s\n", error.message);
 	}
 
   sd_bus_error_free(&error);
   sd_bus_unref(bus);                
 }
-
 
 void SysReboot()
 {
@@ -51,9 +50,32 @@ void SysReboot()
 
 	if (r < 0)
 	{
-	  Log(Err, "Failed to execute reboot: %s\n", error.message);
+	  Log(Err, "Failed to execute Reboot: %s\n", error.message);
 	}
 
+	sd_bus_error_free(&error);
+	sd_bus_unref(bus);
+}
+
+void SysStandby()
+{
+ 	sd_bus *bus = NULL;
+	sd_bus_error error = SD_BUS_ERROR_NULL;
+	int r;
+ 
+	r = sd_bus_open_system(&bus);
+	if (r < 0)
+	{
+	  Log(Err, "Failed to connect to system dbus: %s\n", strerror(-r));
+	}
+ 
+	r = sd_bus_call_method(bus, "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "Suspend", &error, NULL, "b", 0);
+ 
+	if (r < 0)
+	{
+	  Log(Err, "Failed to execute Suspend: %s\n", error.message);
+	}
+ 
 	sd_bus_error_free(&error);
 	sd_bus_unref(bus);
 }

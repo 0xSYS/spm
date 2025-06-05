@@ -30,14 +30,14 @@ class SPM_SocketIO
 
   typedef struct
   {
-    bool socket_response;                 // Enable / disable feedback after sending a packet
-    bool skip_proc_scan;             // Enable / disable scanning the current process list before executing a power action
-    bool debug_log;                 // Enable / disable general debuging (This also includes sending minimal debug information from server to frontend)
-    bool write_log_files;            // Enable / disable writing to log files
-    bool alow_sys_info;              // Enable / disable sending system information trough the socket
-    bool stdout_capture;            // Enable / disable stdout buffer capture to text file when runing headles cli commands
+    bool socket_response;    // Enable / disable feedback after sending a packet
+    bool skip_proc_scan;     // Enable / disable scanning the current process list before executing a power action
+    bool debug_log;          // Enable / disable general debuging (This also includes sending minimal debug information from server to frontend)
+    bool write_log_files;    // Enable / disable writing to log files
+    bool alow_sys_info;      // Enable / disable sending system information trough the socket
+    bool stdout_capture;     // Enable / disable stdout buffer capture to text file when runing headles cli commands
     bool terminate_proceses; // Values: Never, Always, Always first
-    int listen_port;                // Use different port for sending / recepting the packets
+    int listen_port;         // Use different port for sending / recepting the packets
   }ServerSettings;
   
   enum ActionTypes
@@ -54,11 +54,12 @@ class SPM_SocketIO
     static void SndPowerAction(int actType, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
+    static bool IsSSH_Ready(std::string target);                                   // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
     static void AddProtectedProc(std::string target, std::string proc);           // [*] Prevents server restart / poweroff if a specific process is runing
     static void RemoveProtectedProc(std::string target, std::string proc);        // [*] Remove protected process
     static void AddUnauthorizedProc(std::string target, std::string proc);        // [*] Add unauthorized process (the server prevents a specific process from being executed trough headless CLI execution)
     static void RemoveUnauthorizedProc(std::string target, std::string proc);     // [*] Remove unauthorized process
-    static void SndCustomSettings(std::string target, ServerSettings);            // [*] Send custom configuration for the server via sockets
+    static void SndCustomSettings(std::string target, ServerSettings ss);         // [*] Send custom configuration for the server via sockets
     static void SndResetSettings(std::string target);                             // [*] Reset server to default settings by removing the configuration file
     static void SndClearLogs(std::string target);                                 // [*] Send clearance of the log files
     static void SndStopServer(std::string target);                                // [*] Stops the server from listening

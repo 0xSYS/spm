@@ -321,6 +321,7 @@ void SPM_SocketIO::SndCustomSettings(std::string target, ServerSettings ss)
 
     // Sending the packet to the desired target
     send(sckt, serialSettings.str().c_str(), strlen(serialSettings.str().c_str()), 0);
+    SPM_LOG(SPMDebug::Info, "Sent custom settings");
     close(sckt);
     
   }
@@ -380,7 +381,7 @@ void SPM_SocketIO::AddProtectedProc(std::string target, std::string proc)
   {
     packet << "NewProtectedProc=" << proc;
     send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
-    SPM_LOG(SPMDebug::Success, "Custom process successfully sent to ", target);
+    SPM_LOG(SPMDebug::Success, "Protected process was successfuly sent to ", target);
     close(sckt);
   }
   else
@@ -399,7 +400,7 @@ void SPM_SocketIO::RemoveProtectedProc(std::string target, std::string proc)
   {
     packet << "RemoveProtectedProc=" << proc;
     send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
-    SPM_LOG(SPMDebug::Success, "New unauthorized process was successfully sent to ", target);
+    SPM_LOG(SPMDebug::Success, "New protected process was successfully removed from ", target);
     close(sckt);
   }
   else
@@ -437,7 +438,7 @@ void SPM_SocketIO::RemoveUnauthorizedProc(std::string target, std::string proc)
   {
     packet << "RemoveUnauthorizedProc=" << proc;
     send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
-    SPM_LOG(SPMDebug::Success, "New unauthorized process was successfully sent to ", target);
+    SPM_LOG(SPMDebug::Success, "New unauthorized process was successfully removed from ", target);
     close(sckt);
   }
   else
@@ -455,7 +456,7 @@ void SPM_SocketIO::SndStopServer(std::string target)
   if(sockInit(sckt, target))
   {
     send(sckt, packet, strlen(packet), 0);
-    SPM_LOG(SPMDebug::Success, "Sent clear logs");
+    SPM_LOG(SPMDebug::Success, "Sent stop server");
     close(sckt);
   }
   else
@@ -491,7 +492,7 @@ void SPM_SocketIO::SndKillServer(std::string target)
   if(sockInit(sckt, target))
   {
     send(sckt, packet, strlen(packet), 0);
-    SPM_LOG(SPMDebug::Success, "Sent clear logs");
+    SPM_LOG(SPMDebug::Success, "Sent kill server");
     close(sckt);
   }
   else

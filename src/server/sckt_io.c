@@ -224,6 +224,14 @@ void StartScktReception()
     {
       // Force reboot even when there's a process runing (Still very dangerous)
     }
+    else if(strcmp(buffer, "stby") == 0)
+    {
+      SysReboot();
+    }
+    else if(strcmp(buffer, "fstby") == 0)
+    {
+      // Forced standby mode
+    }
     else if(strcmp(buffer, "RstSettings") == 0)
     {
       // ResetSettings();
