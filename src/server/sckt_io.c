@@ -24,9 +24,9 @@
 
 
 
-configuration SettingsUnpack(char s[])
+config SettingsUnpack(char s[])
 {
-  configuration cfg;
+  config cfg;
   char * str_ptr;
   char * tok;
 
@@ -51,14 +51,14 @@ configuration SettingsUnpack(char s[])
           cfg.dbg_log = (bool)tmp;
         }
       }
-      else if(strncmp(tok, "feedback=", 9) == 0)
+      else if(strncmp(tok, "scktResp=", 9) == 0)
       {
         char * end_ptr;
         int errno = 0;
         long tmp = strtol(tok + 9, &end_ptr, 10);
         if(errno == 0 && *end_ptr == '\0')
         {
-          cfg.feedback = (bool)tmp;
+          cfg.socket_response = (bool)tmp;
         }
       }
       else if(strncmp(tok, "allowSysInfo=", 13) == 0)
@@ -133,7 +133,7 @@ void StartScktReception()
   struct sockaddr_in addr;
 
 
-  configuration newCfg;
+  config newCfg;
 
 
   int opt = 1;
@@ -212,6 +212,7 @@ void StartScktReception()
   else if(strstr(buffer, "customSettings:"))
   {
     newCfg = SettingsUnpack(buffer);
+    WriteConfig(newCfg);
     /*
     Todo:
     Make WriteConfig() to work...

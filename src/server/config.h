@@ -14,9 +14,13 @@ typedef struct
   bool skip_proc_scan;
   bool terminate_processes;
   bool stdout_capture;
-  bool feedback;
+  bool socket_response;
   int port;
-}configuration;
+}config;
 
-void ReadConfig();
-void WriteConfig(configuration cfg);
+extern config default_conf;
+extern config current_conf;
+
+config ReadConfig();
+void WriteConfig(config cfg);
+void PrintConfig(config cfg);

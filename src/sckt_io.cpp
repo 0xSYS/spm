@@ -314,7 +314,7 @@ void SPM_SocketIO::SndCustomSettings(std::string target, ServerSettings ss)
   if(sockInit(sckt, target))
   {
     // Constructing the settings packet
-    serialSettings << "customSettings: feedback=" << ss.feedback          << " allowSysInfo="  << ss.alowSysInfo;
+    serialSettings << "customSettings: scktResp=" << ss.feedback          << " allowSysInfo="  << ss.alowSysInfo;
     serialSettings << " dbgLog="                  << ss.debugLog          << " port="          << ss.listenPort;
     serialSettings << " skipProcScan="            << ss.skipProcScan      << " stdoutCapture=" << ss.stdoutCapture;
     serialSettings << " terminateProcesses="      << ss.terminateProceses << " writeLogFiles=" << ss.writeLogFiles;
