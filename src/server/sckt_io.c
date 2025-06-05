@@ -25,6 +25,15 @@
 
 
 
+
+//void KillServer()
+//{
+//  // fdsfjdsf
+//  // Close socket
+//  close(sckt);
+//  close(serv_fd);
+//}
+
 config SettingsUnpack(char s[])
 {
   config cfg = {0}; // Zero-initialize all fields
@@ -149,7 +158,8 @@ void StartScktReception()
 
   // Create socket
   serv_fd = socket(AF_INET, SOCK_STREAM, 0);
-  if (serv_fd == 0) {
+  if (serv_fd == 0)
+  {
     Log(Err, "Failed to create socket !!");
     perror("socket failed");
     exit(EXIT_FAILURE);
@@ -221,6 +231,7 @@ void StartScktReception()
     //TestCall();
     char *copy = strdup(buffer); // Copy the buffer temporarly and then start unpacking the settings
     newCfg = SettingsUnpack(copy);
+    free(copy);
     //PrintConfig(newCfg);
     WriteConfig(newCfg);
     /*
@@ -232,8 +243,9 @@ void StartScktReception()
   {
     // NewBlacklistProcess(const char * procName);
   }
-
-  // Close socket
-  close(sckt);
-  close(serv_fd);
+  else if(strcmp(buffer, "killServ") == 0)
+  {
+    close(sckt);
+    close(serv_fd);
+  }
 }
