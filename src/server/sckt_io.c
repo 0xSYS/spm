@@ -126,6 +126,10 @@ config SettingsUnpack(char s[])
   return cfg;
 }
 
+void TestCall()
+{
+  Log(Info, "Testing some call...");
+}
 
 void StartScktReception()
 {

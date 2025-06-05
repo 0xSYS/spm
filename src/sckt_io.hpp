@@ -30,14 +30,14 @@ class SPM_SocketIO
 
   typedef struct
   {
-    bool feedback;                 // Enable / disable feedback after sending a packet
-    bool skipProcScan;             // Enable / disable scanning the current process list before executing a power action
-    bool debugLog;                 // Enable / disable general debuging (This also includes sending minimal debug information from server to frontend)
-    bool writeLogFiles;            // Enable / disable writing to log files
-    bool alowSysInfo;              // Enable / disable sending system information trough the socket
-    bool stdoutCapture;            // Enable / disable stdout buffer capture to text file when runing headles cli commands
-    std::string terminateProceses; // Values: Never, Always, Always first
-    int listenPort;                // Use different port for sending / recepting the packets
+    bool socket_response;                 // Enable / disable feedback after sending a packet
+    bool skip_proc_scan;             // Enable / disable scanning the current process list before executing a power action
+    bool debug_log;                 // Enable / disable general debuging (This also includes sending minimal debug information from server to frontend)
+    bool write_log_files;            // Enable / disable writing to log files
+    bool alow_sys_info;              // Enable / disable sending system information trough the socket
+    bool stdout_capture;            // Enable / disable stdout buffer capture to text file when runing headles cli commands
+    bool terminate_proceses; // Values: Never, Always, Always first
+    int listen_port;                // Use different port for sending / recepting the packets
   }ServerSettings;
   
   enum ActionTypes

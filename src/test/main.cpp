@@ -93,7 +93,7 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.102");
+	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Reboot, "192.168.1.102");
 	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
@@ -193,6 +193,20 @@ void Test18()
   
 }
 
+void Test19()
+{
+  SPM_SocketIO::ServerSettings mySettings;
+  mySettings.alow_sys_info = false;
+  mySettings.debug_log = false;
+  mySettings.write_log_files = false;
+  mySettings.stdout_capture = false;
+  mySettings.terminate_proceses = false;
+  mySettings.listen_port = 5200;
+  mySettings.skip_proc_scan = false;
+  mySettings.socket_response = false;
+  SPM_SocketIO::SndCustomSettings("192.168.1.102", mySettings);
+}
+
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
@@ -204,7 +218,7 @@ int main(int argc, char * argv[])
   // Test6();
 	// Test7();
 	// Test8();
-  Test9();
+  // Test9();
   // Test10();
   // Test11();
   // Test12();
@@ -214,5 +228,6 @@ int main(int argc, char * argv[])
   // Test16();
   // Test17();
   // Test18();
+  Test19();
 	return 0;
 }
