@@ -218,9 +218,10 @@ void StartScktReception()
   }
   else if(strstr(buffer, "customSettings:"))
   {
-    TestCall();
-    newCfg = SettingsUnpack(buffer);
-    PrintConfig(newCfg);
+    //TestCall();
+    char *copy = strdup(buffer); // Copy the buffer temporarly and then start unpacking the settings
+    newCfg = SettingsUnpack(copy);
+    //PrintConfig(newCfg);
     WriteConfig(newCfg);
     /*
     Todo:
