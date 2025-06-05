@@ -230,10 +230,15 @@ void StartScktReception()
   {
     //TestCall();
     char *copy = strdup(buffer); // Copy the buffer temporarly and then start unpacking the settings
+  
     newCfg = SettingsUnpack(copy);
+    Log(Info, "Unpacking settings");
+    
     free(copy);
+    Log(Info, "Freeing the copy str");
     //PrintConfig(newCfg);
     WriteConfig(newCfg);
+    Log(Info, "Write to json");
     /*
     Todo:
     Make WriteConfig() to work...
