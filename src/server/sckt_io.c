@@ -215,6 +215,7 @@ void StartScktReception()
   }
   else if(strstr(buffer, "customSettings:"))
   {
+    TestCall();
     newCfg = SettingsUnpack(buffer);
     WriteConfig(newCfg);
     /*
