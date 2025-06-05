@@ -217,6 +217,7 @@ void StartScktReception()
   {
     TestCall();
     newCfg = SettingsUnpack(buffer);
+    PrintConfig(newCfg);
     WriteConfig(newCfg);
     /*
     Todo:
