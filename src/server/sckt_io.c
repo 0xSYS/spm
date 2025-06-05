@@ -138,11 +138,6 @@ config SettingsUnpack(char s[])
   return cfg;
 }
 
-void TestCall()
-{
-  Log(Info, "Testing some call...");
-}
-
 void StartScktReception()
 {
   int serv_fd, sckt;
@@ -187,83 +182,76 @@ void StartScktReception()
     exit(EXIT_FAILURE);
   }
 
-  // Accept a connection
+  // main loop of the socket listener
   while(1)
   {
-  sckt = accept(serv_fd, (struct sockaddr *)&addr, (socklen_t *)&addrlen);
-  if(sckt < 0)
-  {
-    Log(Err, "Failed to accept connection !!");
-    perror("accept");
-    //exit(EXIT_FAILURE);
-    continue;
-  }
+    sckt = accept(serv_fd, (struct sockaddr *)&addr, (socklen_t *)&addrlen);
+    if(sckt < 0)
+    {
+      Log(Err, "Failed to accept connection !!");
+      perror("accept");
+      //exit(EXIT_FAILURE);
+      continue;
+    }
 
-  // Read data
-  memset(buffer, 0, sizeof(buffer)); // Clear buffer before reading
-          int n = read(sckt, buffer, sizeof(buffer) - 1);
-          if (n <= 0) {
-              close(sckt);
-              continue;
-          }
-          buffer[n] = '\0'; // Null-terminate
+    // Read data
+    memset(buffer, 0, sizeof(buffer)); // Clear buffer before reading
+    int n = read(sckt, buffer, sizeof(buffer) - 1);
+    if(n <= 0)
+    {
+      close(sckt);
+      continue;
+    }
+    buffer[n] = '\0'; // Null-terminate
   
-          Log(Info, "Received socket msg: %s\n", buffer);
+    Log(Info, "Received socket msg: %s\n", buffer);
 
-  if(strcmp(buffer, "pwroff") == 0)
-  {
-    // Call Poweroff
-    SysPowerOff();
-  }
-  else if(strcmp(buffer, "fpwroff") == 0)
-  {
-    // Force power off even when there's a process runing (Very dagerous)
-  }
-  else if(strcmp(buffer, "rbt") == 0)
-  {
-    // Call Reboot
-    SysReboot();
-  }
-  else if(strcmp(buffer, "frbt") == 0)
-  {
-    // Force reboot even when there's a process runing (Still very dangerous)
-  }
-  else if(strcmp(buffer, "RstSettings") == 0)
-  {
-    // ResetSettings();
-  }
-  else if(strcmp(buffer, "clrLogs") == 0)
-  {
-    // ClearLogs();
-  }
-  else if(strstr(buffer, "customSettings:"))
-  {
-    //TestCall();
-    char *copy = strdup(buffer); // Copy the buffer temporarly and then start unpacking the settings
-  
-    newCfg = SettingsUnpack(copy);
-    Log(Info, "Unpacking settings");
-    
-    free(copy);
-    Log(Info, "Freeing the copy str");
-    //PrintConfig(newCfg);
-    WriteConfig(newCfg);
-    Log(Info, "Write to json");
-    /*
-    Todo:
-    Make WriteConfig() to work...
-    */
-  }
-  else if(strstr(buffer, "newBlackListProc="))
-  {
-    // NewBlacklistProcess(const char * procName);
-  }
-  else if(strcmp(buffer, "killServ") == 0)
-  {
-    //close(sckt);
-    //close(serv_fd);
-  }
-  close(sckt);
+    if(strcmp(buffer, "pwroff") == 0)
+    {
+      // Call Poweroff
+      SysPowerOff();
+    }
+    else if(strcmp(buffer, "fpwroff") == 0)
+    {
+      // Force power off even when there's a process runing (Very dagerous)
+    }
+    else if(strcmp(buffer, "rbt") == 0)
+    {
+      // Call Reboot
+      SysReboot();
+    }
+    else if(strcmp(buffer, "frbt") == 0)
+    {
+      // Force reboot even when there's a process runing (Still very dangerous)
+    }
+    else if(strcmp(buffer, "RstSettings") == 0)
+    {
+      // ResetSettings();
+    }
+    else if(strcmp(buffer, "clrLogs") == 0)
+    {
+      // ClearLogs();
+    }
+    else if(strstr(buffer, "customSettings:"))
+    {
+      char *copy = strdup(buffer); // Copy the buffer temporarly and then start unpacking the settings
+      newCfg = SettingsUnpack(copy);
+      Log(Info, "Unpacking settings");
+      
+      free(copy);
+      WriteConfig(newCfg);
+    }
+    else if(strstr(buffer, "newBlackListProc="))
+    {
+      // NewBlacklistProcess(const char * procName);
+    }
+    else if(strcmp(buffer, "killServ") == 0)
+    {
+      close(sckt);
+      close(serv_fd);
+      exit(0);
+    }
+    close(sckt);
   }
   close(serv_fd);
 }
