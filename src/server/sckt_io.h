@@ -3,7 +3,7 @@
 
 
 
-#define DEFAULT_PORT 8080
+#define DEFAULT_PORT 8124
 
 void KillServer();
 void SndSuccessCallback();

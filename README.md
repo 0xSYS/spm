@@ -31,6 +31,8 @@ A set software components designed for managing computers / servers with support
 - [ ] Headless Command Line execution
 - [ ] stdout buffer capture to text file
 - [ ] Command Line interface
+- [ ] Saving power statistics
+- [ ] Custom json written device / server lists
 - [ ] Local web page setup
 - [ ] C/C++ API examples (In progress)
 

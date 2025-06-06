@@ -93,7 +93,7 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Reboot, "192.168.1.102");
+	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.102");
 	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
@@ -223,7 +223,7 @@ int main(int argc, char * argv[])
   // Test6();
 	// Test7();
 	// Test8();
-  // Test9();
+  Test9();
   // Test10();
   // Test11();
   // Test12();
@@ -234,6 +234,6 @@ int main(int argc, char * argv[])
   // Test17();
   // Test18();
   // Test19();
-  Test20();
+  // Test20();
 	return 0;
 }

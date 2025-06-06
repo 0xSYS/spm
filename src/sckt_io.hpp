@@ -10,7 +10,7 @@
 
 
 
-#define DEFAULT_PORT 8080
+#define DEFAULT_PORT 8124
 
 
 class SPM_SocketIO
@@ -50,11 +50,14 @@ class SPM_SocketIO
     ForceStandby
   };
   
-    static bool ping(int count, int delay, std::string ip);
+    static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
+    static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
     static void SndPowerAction(int actType, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
-    static bool IsSSH_Ready(std::string target);                                   // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
+    static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
+    static void EnableSSHDaemon(std::string target);                              // [ ] Enable / disable the SSH daemon
+    static void CheckRuningService(std::string target, std::string serv_name);    // [ ] Check for any custom runing service
     static void AddProtectedProc(std::string target, std::string proc);           // [*] Prevents server restart / poweroff if a specific process is runing
     static void RemoveProtectedProc(std::string target, std::string proc);        // [*] Remove protected process
     static void AddUnauthorizedProc(std::string target, std::string proc);        // [*] Add unauthorized process (the server prevents a specific process from being executed trough headless CLI execution)
