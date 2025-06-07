@@ -282,7 +282,7 @@ void SPMUtils::printDevArray(std::vector<SPMList::device> d)
   }
 }
 
-char * SPMUtils::getErr()
+char * SPMUtils::getStdErr()
 {
   char buf[256];
   char* msg;

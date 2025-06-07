@@ -19,10 +19,9 @@ class SPMUtils
   static int removeDir(std::string d);
   static bool checkDir(std::string d);
   static bool checkFile(std::string f);
-  static bool ping(const std::string & ip);
   static void printConfig(SPMConfig::cfgStruct c);
   static void printDevArray(std::vector<SPMList::device> d);
-  static char * getErr();
+  static char * getStdErr();
   static std::string genRandomHash(size_t len);
 #if defined(_WIN32) || defined(_WIN64)
   static void SetWinTerm();

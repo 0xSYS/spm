@@ -166,13 +166,13 @@ void Test15()
 
 void Test16()
 {
-  SPM_SocketIO::ping(10, 1, "192.168.1.102");
+  SPM_SocketIO::ping(50, 1, "192.168.1.102");
 }
 
 void Test17()
 {
   SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
-  SPM_SocketIO::ping(90, 1, "192.168.1.102");
+  SPM_SocketIO::ping(50, 1, "192.168.1.102");
 }
 
 

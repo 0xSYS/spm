@@ -43,12 +43,9 @@
 
 #include "utils.hpp"
 #include "spm.hpp"
-// #include "globals.hpp"
 
 
 
-//static SPMUtils spmUtils;
-//static SPM spm;
 
 
 

@@ -116,7 +116,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
   int sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if(sockfd < 0)
   {
-    SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", SPMUtils::getErr());
+    SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", SPMUtils::getStdErr());
     return false;
   }
 
@@ -153,7 +153,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
   
       if(sendto(sockfd, &icmp_hdr, sizeof(icmp_hdr), 0, (struct sockaddr*)&addr, sizeof(addr)) <= 0)
       {
-        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getErr());
+        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getStdErr());
         continue; // Don't return, try next ping
       }
   
@@ -212,7 +212,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 
       if(sendto(sockfd, &icmp_hdr, sizeof(icmp_hdr), 0, (struct sockaddr*)&addr, sizeof(addr)) <= 0)
       {
-        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getErr());
+        SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", SPMUtils::getStdErr());
         continue; // Don't return, try next ping
       }
 
