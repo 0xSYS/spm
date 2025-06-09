@@ -69,6 +69,11 @@ void Test5()
 void Test6()
 {
 	std::vector<std::string> dummy = SPMDetect::CreateIP_Table();
+	std::cout << "IP Table: \n";
+	for(const auto& ips : dummy)
+	{
+	  std::cout << ips << "\n";
+	}
 }
 
 void Test7()
@@ -212,6 +217,20 @@ void Test20()
   SPM_SocketIO::SndKillServer("192.168.1.102");
 }
 
+#ifdef __linux__
+void Test21()
+{
+  std::vector<SPMDetect::arpDev> test;
+  test = SPMDetect::GetArpTable();
+  
+  for(const auto& dev : test)
+  {
+    std::cout << " | ip: " << dev.ip << " | hw_type: " << dev.hw_type << " | flags: " << dev.flags << " | mac_addr: " << dev.mac_addr << " | device: " << dev.device << "\n";
+  }
+}
+#endif
+
+
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
@@ -220,10 +239,10 @@ int main(int argc, char * argv[])
 	// Test3(); // 
 	// Test4(); // All pass
 	// Test5();
-  // Test6();
+  Test6();
 	// Test7();
 	// Test8();
-  Test9();
+  // Test9();
   // Test10();
   // Test11();
   // Test12();
@@ -235,5 +254,8 @@ int main(int argc, char * argv[])
   // Test18();
   // Test19();
   // Test20();
+#ifdef __linux__
+    //Test21();
+#endif
 	return 0;
 }

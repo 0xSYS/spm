@@ -137,9 +137,9 @@ int SPMUtils::removeDir(std::string d)
         if(!stat(buf, &statbuf))
         {
           if(S_ISDIR(statbuf.st_mode))
-          r2 = SPMUtils::removeDir(buf);
+            r2 = SPMUtils::removeDir(buf);
           else
-          r2 = unlink(buf);
+            r2 = unlink(buf);
         }
         free(buf);
       }
@@ -329,4 +329,15 @@ char * SPMUtils::getStdErr()
     }
     SetConsoleOutputCP(CP_UTF8); //Enabling unicode charset on windows console
   }
+  
+  
+std::string SPMUtils::GetWinApiErr(DWORD err_code)
+{
+  LPVOID MsgBuf;
+  std::string msg_str;
+  
+  FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR) &MsgBuf, 0, NULL);
+  msg_str = (char*)MsgBuf;
+  return msg_str;
+}
 #endif

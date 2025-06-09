@@ -30,11 +30,9 @@ Main Source file of SPM library
 
 #include "spm.hpp"
 #include "utils.hpp"
-// #include "globals.hpp"
 #include "dbg_log.hpp"
 #include "config.hpp"
 #include "spm_list.hpp"
-
 
 
 

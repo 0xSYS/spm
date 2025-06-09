@@ -12,6 +12,13 @@
 
 #define DEFAULT_PORT 8124
 
+#if defined(_WIN32) || defined(_WIN64)
+  #define SPM_SOCKET SOCKET
+#endif
+
+#ifdef __linux__
+  #define SPM_SOCKET int
+#endif
 
 class SPM_SocketIO
 {
