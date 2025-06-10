@@ -282,25 +282,27 @@ void SPMUtils::printDevArray(std::vector<SPMList::device> d)
   }
 }
 
-char * SPMUtils::getStdErr()
+std::string SPMUtils::getStdErr()
 {
   char buf[256];
-  char* msg;
-#if((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE)
-  strerror_r(errno, temp_msrgerr, sizeof(temp_msrgerr));
-  msg = buf;
-#endif
-
-#ifdef __linux__
-  msg = strerror_r(errno, buf, sizeof(buf));
-#endif
 
 #if defined(_WIN32) || defined(_WIN64)
   strerror_s(buf, sizeof(buf), errno);
-  //msg = std::string(buf);
-  return std::string(buf).c_str();
+  return std::string(buf);
+#elif defined(__linux__)
+  // GNU-specific strerror_r returns char*
+#ifdef _GNU_SOURCE
+  return std::string(strerror_r(errno, buf, sizeof(buf)));
+#else
+  // POSIX strerror_r returns int, fills buf
+  strerror_r(errno, buf, sizeof(buf));
+  return std::string(buf);
 #endif
-  //return msg;
+#else
+  // Fallback for other systems
+  return std::string(strerror(errno));
+#endif
+
 }
 
 #if defined(_WIN32) || defined(_WIN64)

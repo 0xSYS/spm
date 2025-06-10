@@ -28,7 +28,7 @@ class SPMUtils
   static void printConfig(SPMConfig::cfgStruct c);
   static std::string getBuildConfig(); // Todo
   static void printDevArray(std::vector<SPMList::device> d);
-  static char * getStdErr();
+  static std::string getStdErr();
   static std::string genRandomHash(size_t len);
 #if defined(_WIN32) || defined(_WIN64)
   static void SetWinTerm();
