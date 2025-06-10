@@ -2,6 +2,11 @@
 
 
 
+#if defined(_WIN32) || defined(_WIN64)
+  #include <windows.h>
+#endif
+
+
 #include <string>
 #include "config.hpp"
 #include "spm_list.hpp"
