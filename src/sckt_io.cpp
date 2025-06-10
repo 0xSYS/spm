@@ -181,6 +181,8 @@ void CloseSPM_Socket(SPM_SOCKET s)
 bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 {
   SPM_SOCKET sockfd;
+  int replies = 0;
+  
 #ifdef __linux__
   sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if(sockfd < 0)
@@ -197,8 +199,6 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
   icmp_hdr.type = ICMP_ECHO;
   icmp_hdr.code = 0;
   icmp_hdr.un.echo.id = getpid();
-
-  int replies = 0;
   
   if(delay <= 0)
   {
@@ -382,7 +382,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
       icmp_hdr.code = 0;
       icmp_hdr.un.echo.id = (uint16_t)GetCurrentProcessId();
 
-      int replies = 0;
+      //int replies = 0;
 
       if(delay <= 0)
       {

@@ -173,7 +173,7 @@ int SPMUtils::removeDir(std::string d)
       if(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
         // It's a directory, recurse
-        if(removeDirWin(fullPath) != 0)
+        if(SPMUtils::removeDir(fullPath) != 0)
           r = -1;
       }
       else
@@ -289,10 +289,18 @@ char * SPMUtils::getStdErr()
 #if((_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE)
   strerror_r(errno, temp_msrgerr, sizeof(temp_msrgerr));
   msg = buf;
-#else
+#endif
+
+#ifdef __linux__
   msg = strerror_r(errno, buf, sizeof(buf));
 #endif
-  return msg;
+
+#if defined(_WIN32) || defined(_WIN64)
+  strerror_s(buf, sizeof(buf), errno);
+  //msg = std::string(buf);
+  return std::string(buf).c_str();
+#endif
+  //return msg;
 }
 
 #if defined(_WIN32) || defined(_WIN64)
