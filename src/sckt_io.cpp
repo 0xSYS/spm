@@ -180,7 +180,9 @@ void CloseSPM_Socket(SPM_SOCKET s)
 
 bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 {
-  int sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+  SPM_SOCKET sockfd;
+#ifdef __linux__
+  sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
   if(sockfd < 0)
   {
     SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", SPMUtils::getStdErr());
@@ -327,6 +329,138 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
   close(sockfd);
   
   return replies > 0; // Return true if at least one reply was received
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+  struct icmphdr
+  {
+    uint8_t type;
+    uint8_t code;
+    uint16_t checksum;
+    union
+    {
+      struct
+      {
+        uint16_t id;
+        uint16_t sequence;
+      }echo;
+      
+      uint32_t gateway;
+      struct
+      {
+        uint16_t __unused;
+        uint16_t mtu;
+      }frag;
+    }un;
+  };
+  
+  
+  WSADATA wsaData;
+  if(WSAStartup(MAKEWORD(2,2), &wsaData) != 0)
+  {
+    SPM_LOG(SPMDebug::Err, "WSAStartup failed!");
+    return false;
+  }
+  else
+  {
+
+    sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    if(sockfd == INVALID_SOCKET)
+    {
+      SPM_LOG(SPMDebug::Err, "socket() failed !!! | ", WSAGetLastError());
+      WSACleanup();
+      return false;
+    }
+    else
+    {
+      sockaddr_in addr;
+      addr.sin_family = AF_INET;
+      addr.sin_addr.s_addr = inet_addr(ip.c_str());
+
+      icmphdr icmp_hdr;
+      icmp_hdr.type = 8; // ICMP_ECHO
+      icmp_hdr.code = 0;
+      icmp_hdr.un.echo.id = (uint16_t)GetCurrentProcessId();
+
+      int replies = 0;
+
+      if(delay <= 0)
+      {
+        SPM_LOG(SPMDebug::Err, "Delay cannot be 0 or smaller than 0 !!! | Delay set to 1 sec.");
+        delay = 1;
+      }
+
+      auto checksum = [](void* b, int len) -> uint16_t
+      {
+        uint16_t* buf = (uint16_t*)b;
+        uint32_t sum = 0;
+        for (; len > 1; len -= 2)
+        sum += *buf++;
+        if (len == 1)
+        sum += *(uint8_t*)buf;
+        sum = (sum >> 16) + (sum & 0xFFFF);
+        sum += (sum >> 16);
+        return(uint16_t)(~sum);
+      };
+
+      int seq = 0;
+      int max_count = (count == 0) ? INT_MAX : count;
+      for(int j = 0; j < max_count; ++j)
+      {
+        icmp_hdr.un.echo.sequence = seq++;
+        icmp_hdr.checksum = 0;
+        icmp_hdr.checksum = checksum(&icmp_hdr, sizeof(icmp_hdr));
+        
+        std::this_thread::sleep_for(std::chrono::seconds(delay));
+        auto start = std::chrono::high_resolution_clock::now();
+        
+        int sent = sendto(sockfd, (const char*)&icmp_hdr, sizeof(icmp_hdr), 0, (sockaddr*)&addr, sizeof(addr));
+        if(sent == SOCKET_ERROR)
+        {
+          SPM_LOG(SPMDebug::Err, "sendto() failed !!! | ", WSAGetLastError());
+          continue;
+        }
+        
+        char buf[1024];
+        sockaddr_in r_addr;
+        int len = sizeof(r_addr);
+        
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(sockfd, &readfds);
+        
+        timeval timeout;
+        timeout.tv_sec = 1;
+        timeout.tv_usec = 0;
+        
+        int ret = select(0, &readfds, NULL, NULL, &timeout);
+        if(ret > 0 && FD_ISSET(sockfd, &readfds))
+        {
+          int bytes = recvfrom(sockfd, buf, sizeof(buf), 0, (sockaddr*)&r_addr, &len);
+          if (r_addr.sin_addr.s_addr != addr.sin_addr.s_addr)
+            continue;
+          if(bytes > 0)
+          {
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> elapsed = end - start;
+            SPM_LOG(SPMDebug::Success, "seq: ", seq, " | Got reply from ", ip, " in ", elapsed.count(), " ms");
+            replies++;
+          }
+        }
+        else
+        {
+          SPM_LOG(SPMDebug::Err, "Request timed out !! | seq: ", seq);
+        }
+        if (count != 0 && j + 1 >= count)
+          break;
+      }
+    }
+  }
+
+  closesocket(sockfd);
+  WSACleanup();
+  return replies > 0;
+#endif
 }
 
 void SPM_SocketIO::SndPowerAction(int actType, std::string target)
