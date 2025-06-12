@@ -21,6 +21,20 @@ class SPM
   std::vector<SPMList::device> mainList; // Store the main list at first run
   int current_env_index = 0;
   
+  enum server_actions
+  {
+    Wake = 1,
+    Shutdown,
+    ForceShutdown,
+    Restart,
+    ForceRestart,
+    Sleep,
+    ForceSleep,
+    Standby,
+    ForceStandby,
+    Hibernate     // Dosent require forced action as it dosent cause any data loss or corruption (Last state of the os is saved to local storage)
+  };
+  
   
   typedef struct
   {
@@ -43,7 +57,9 @@ class SPM
 	static void ReloadDevList();                               // [ ] Reload a device list
 	static void CheckPowerStat(SPMList::device d);             // [ ] Checks for power status to the given server
 	static void ServerAction(int act_type, SPMList::device d); // [ ] Send a power action to a server (Poweroff, Reboot, Standby, Forced Poweroff, Forced Reboot)
+	static void SetIPMI_User(std::string usr, std::string pw); // [ ] Set user and password on IPMI in order to perform an action
 	static void Terminate();                                   // [ ] Safe exit SPM (unloading stuff freeing variables, stopping processes, etc)
+	static unsigned int GetVersion();                          // [ ] Ensuring compatibility
 };
 
 

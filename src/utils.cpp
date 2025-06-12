@@ -351,3 +351,34 @@ std::string SPMUtils::GetWinApiErr(DWORD err_code)
   return msg_str;
 }
 #endif
+
+std::string SPMUtils::getBuildConfig()
+{
+  std::string result;
+
+#ifdef ANSI_ESCAPES
+  result += "--ansi-escapes=y\n";
+#else
+  result += "--ansi-escapes=n\n";
+#endif
+
+#ifdef NO_MSGBOX
+  result += "--no-msgbox=y\n";
+#else
+  result += "--no-msgbox=n\n";
+#endif
+
+#ifdef DEBUG_FN_CALLS
+  result += "--debug-function-calls=y\n";
+#else
+  result += "--debug-function-calls=n\n";
+#endif
+
+#ifdef SINGLE_LINE_CONFIG
+  result += "--single-line-config=y\n";
+#else
+  result += "--single-line-config=n\n";
+#endif
+
+  return result;
+}

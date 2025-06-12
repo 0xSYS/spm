@@ -8,6 +8,8 @@
 #include <thread>
 #include <chrono>
 
+#include "spm.hpp"
+
 
 
 #define DEFAULT_PORT 8124
@@ -47,19 +49,22 @@ class SPM_SocketIO
     int listen_port;         // Use different port for sending / recepting the packets
   }ServerSettings;
   
-  enum ActionTypes
-  {
-    Poweroff = 1,
-    ForcePoweroff, // The forced power actions should be avoided from being used as they can cause system corruptions if not handeled carefully
-    Reboot,
-    ForceReboot,
-    Standby,
-    ForceStandby
-  };
+  //enum action_type
+  //{
+  //  Poweroff = 1,
+  //  ForcePoweroff, // The forced power actions should be avoided from being used as they can cause system corruptions if not handeled carefully
+  //  Reboot,
+  //  ForceReboot,
+  //  Standby,
+  //  ForceStandby,
+  //  Sleep,
+  //  ForceSleep,
+  //  Hibernate
+  //};
   
     static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
     static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
-    static void SndPowerAction(int actType, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
+    static void SndPowerAction(SPM::server_actions at, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
     static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)

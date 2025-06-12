@@ -26,7 +26,7 @@ class SPMUtils
   static bool checkDir(std::string d);
   static bool checkFile(std::string f);
   static void printConfig(SPMConfig::cfgStruct c);
-  static std::string getBuildConfig(); // Todo
+  static std::string getBuildConfig();
   static void printDevArray(std::vector<SPMList::device> d);
   static std::string getStdErr();
   static std::string genRandomHash(size_t len);

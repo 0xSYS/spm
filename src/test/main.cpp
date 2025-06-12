@@ -98,7 +98,7 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	SPM_SocketIO::SndPowerAction(SPM_SocketIO::Reboot, "192.168.1.102");
+	SPM_SocketIO::SndPowerAction(SPM::Restart, "192.168.1.102");
 	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
@@ -230,6 +230,12 @@ void Test21()
 }
 #endif
 
+void Test22()
+{
+  std::string buildconf = SPMUtils::getBuildConfig();
+  std::cout << "build configuration: "<< buildconf;
+}
+
 
 int main(int argc, char * argv[])
 {
@@ -242,7 +248,7 @@ int main(int argc, char * argv[])
   // Test6();
 	// Test7();
 	// Test8();
-  Test9();
+  // Test9();
   // Test10();
   // Test11();
   // Test12();
@@ -257,5 +263,6 @@ int main(int argc, char * argv[])
 #ifdef __linux__
     //Test21();
 #endif
+  Test22();
 	return 0;
 }

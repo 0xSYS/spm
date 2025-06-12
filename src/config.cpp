@@ -66,6 +66,7 @@ void SPMConfig::Write(cfgStruct cfg_out)
   std::ofstream out_conf(out_path.str());
   
 #ifndef SINGLE_LINE_CONFIG
+  out_conf << "// File created from libspm\n\n";
   out_conf << json_out.dump(4); // Write a human-readable json config
 #else
   out_conf << json_out; // If enabled the entire config is written on a single line

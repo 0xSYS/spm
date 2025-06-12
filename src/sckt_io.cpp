@@ -463,40 +463,45 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 #endif
 }
 
-void SPM_SocketIO::SndPowerAction(int actType, std::string target)
+void SPM_SocketIO::SndPowerAction(SPM::server_actions serv_act, std::string target)
 {
   SPM_SOCKET sckt = 0;
   if(sockInit(sckt, target))
   {
-    if(actType == 1)
+    if(serv_act == SPM::Shutdown)
     {
       send(sckt, "pwroff", strlen("pwroff"), 0);
       SPM_LOG(SPMDebug::Info, "Poweroff sent to ", target);
     }
-    else if(actType == 2)
+    else if(serv_act == SPM::ForceShutdown)
     {
       send(sckt, "fpwroff", strlen("fpwroff"), 0);
       SPM_LOG(SPMDebug::Warn, "Forced Poweroff sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
     }
-    else if(actType == 3)
+    else if(serv_act == SPM::Restart)
     {
       send(sckt, "rbt", strlen("rbt"), 0);
       SPM_LOG(SPMDebug::Info, "Reboot sent to ", target);
     }
-    else if(actType == 4)
+    else if(serv_act == SPM::ForceRestart)
     {
       send(sckt, "frbt", strlen("frbt"), 0);
       SPM_LOG(SPMDebug::Warn, "Forced Reboot sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
     }
-    else if(actType == 5)
+    else if(serv_act == SPM::Standby)
     {
       send(sckt, "stby", strlen("stby"), 0);
       SPM_LOG(SPMDebug::Info, "Standby sent to ", target);
     }
-    else if(actType == 6)
+    else if(serv_act == SPM::ForceStandby)
     {
       send(sckt, "fstby", strlen("fstby"), 0);
       SPM_LOG(SPMDebug::Info, "Forced Standby sent to ", target);
+    }
+    else if(serv_act == SPM::Hibernate)
+    {
+      send(sckt, "hiber", strlen("hiber"), 0);
+      SPM_LOG(SPMDebug::Info, "Hibernate sent to ", target);
     }
     CloseSPM_Socket(sckt);
   }
