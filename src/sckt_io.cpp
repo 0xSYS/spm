@@ -82,7 +82,7 @@ bool sockInit(SPM_SOCKET &s, std::string ip)
   else
   {
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(DEFAULT_PORT);
+    serv_addr.sin_port = htons(globalConf.port);
 
 
     if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
@@ -463,47 +463,103 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 #endif
 }
 
+
+std::string SPM_SocketIO::GetServerReplyStr(int s)
+{
+  std::string out;
+  int recv_bytes;
+  
+  recv_bytes = recv(s, repl_buf, sizeof(repl_buf), 0);
+  
+  if(recv_bytes > 0)
+  {
+    // Convert c string to std::string
+    out = repl_buf;
+  }
+  else if(recv_bytes == 0)
+  {
+    SPM_LOG(SPMDebug::Warn, "No server reply !!! 0 bytes received");
+  }
+  else
+  {
+    SPM_LOG(SPMDebug::Err, "An error has occured while getting server reply !!!");
+  }
+  
+  
+  return out;
+}
+
 void SPM_SocketIO::SndPowerAction(SPM::server_actions serv_act, std::string target)
 {
   SPM_SOCKET sckt = 0;
+  std::string received_msg;
+  int recv_byte;
   if(sockInit(sckt, target))
   {
     if(serv_act == SPM::Shutdown)
     {
       send(sckt, "pwroff", strlen("pwroff"), 0);
       SPM_LOG(SPMDebug::Info, "Poweroff sent to ", target);
+      
+      // Try to get erver reply
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceShutdown)
     {
       send(sckt, "fpwroff", strlen("fpwroff"), 0);
       SPM_LOG(SPMDebug::Warn, "Forced Poweroff sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Restart)
     {
       send(sckt, "rbt", strlen("rbt"), 0);
       SPM_LOG(SPMDebug::Info, "Reboot sent to ", target);
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceRestart)
     {
       send(sckt, "frbt", strlen("frbt"), 0);
       SPM_LOG(SPMDebug::Warn, "Forced Reboot sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Standby)
     {
       send(sckt, "stby", strlen("stby"), 0);
       SPM_LOG(SPMDebug::Info, "Standby sent to ", target);
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceStandby)
     {
       send(sckt, "fstby", strlen("fstby"), 0);
       SPM_LOG(SPMDebug::Info, "Forced Standby sent to ", target);
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Hibernate)
     {
       send(sckt, "hiber", strlen("hiber"), 0);
       SPM_LOG(SPMDebug::Info, "Hibernate sent to ", target);
+      
+      received_msg = GetServerReplyStr(sckt);
+      received_msg.push_back('\n');
     }
     CloseSPM_Socket(sckt);
+    
+#ifdef ANSI_ESCAPES
+    SPM_LOG(SPMDebug::Info, "Server replied from: \033[38;5;214m", target, "\033[0m with message: ", received_msg);
+#else
+    SPM_LOG(SPMDebug::Info, "Server replied from: ", target, " with message: ", received_msg);
+#endif
   }
   else
   {

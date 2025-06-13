@@ -5,6 +5,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <errno.h>
+#include <stdarg.h>
 
 
 
@@ -138,6 +139,44 @@ config SettingsUnpack(char s[])
   return cfg;
 }
 
+void SndReply(int s, enum reply_type rt, const char * msg_fmt, ...)
+{
+  va_list args;
+  char msg_buf[100];
+  char full_buf[350];
+  int written_buf;
+  
+  va_start(args, msg_fmt);
+  vsnprintf(msg_buf, sizeof(msg_buf), msg_fmt, args);
+  va_end(args);
+  
+  // Constructing the reply packets depending on the choosen reply type
+  if(rt == repl_success)
+  {
+    written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> success: %s", msg_buf);
+  }
+  else if(rt == repl_warn)
+  {
+    written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> warn: %s", msg_buf);
+  }
+  else if(rt == repl_failure)
+  {
+    written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> err: %s", msg_buf);
+  }
+  else if(rt == repl_unknown)
+  {
+    written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> unknown_err: %s", msg_buf);
+  }
+  
+  if(written_buf >= sizeof(full_buf))
+  {
+    // Output was truncated
+    Log(Warn, "Reply message was truncated !!!");
+  }
+  
+  send(s, &full_buf, sizeof(full_buf), 0);
+}
+
 void StartScktReception()
 {
   int serv_fd, sckt;
@@ -209,28 +248,41 @@ void StartScktReception()
     if(strcmp(buffer, "pwroff") == 0)
     {
       // Call Poweroff
-      SysPowerOff();
+      SndReply(sckt, repl_success, "Poweroff succesfully executed");
+      // Not The proper way to do that
+      // Fisrt requirement is to check for runing procees and if there's any runing process simply deny the following action
+      SysAction(Poweroff);
     }
     else if(strcmp(buffer, "fpwroff") == 0)
     {
+      SndReply(sckt, repl_success, "Forced Poweroff succesfully executed");
       // Force power off even when there's a process runing (Very dagerous)
     }
     else if(strcmp(buffer, "rbt") == 0)
     {
       // Call Reboot
-      SysReboot();
+      SndReply(sckt, repl_success, "Reboot succesfully executed");
+      SysAction(Reboot);
     }
     else if(strcmp(buffer, "frbt") == 0)
     {
+      SndReply(sckt, repl_success, "Forced Reboot succesfully executed");
       // Force reboot even when there's a process runing (Still very dangerous)
     }
     else if(strcmp(buffer, "stby") == 0)
     {
-      SysReboot();
+      SndReply(sckt, repl_success, "Standby executed");
+      SysAction(Standby);
     }
     else if(strcmp(buffer, "fstby") == 0)
     {
+      SndReply(sckt, repl_success, "Forced Standby succesfully executed");
       // Forced standby mode
+    }
+    else if(strcmp(buffer, "hiber") == 0)
+    {
+      SndReply(sckt, repl_success, "Hibernation executed");
+      SysAction(Hibernate);
     }
     else if(strcmp(buffer, "RstSettings") == 0)
     {

@@ -22,6 +22,8 @@
   #define SPM_SOCKET int
 #endif
 
+inline char repl_buf[1024];
+
 class SPM_SocketIO
 {
   public:
@@ -64,8 +66,9 @@ class SPM_SocketIO
   
     static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
     static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
-    static void SndPowerAction(SPM::server_actions at, std::string target);                  // [*] Send power action to a device (Poweroff / reboot)
+    static void SndPowerAction(SPM::server_actions at, std::string target);       // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
+    static std::string GetServerReplyStr(int s);                                       // [ ] Get the curret replied message from the server
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
     static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
     static void EnableSSHDaemon(std::string target);                              // [ ] Enable / disable the SSH daemon

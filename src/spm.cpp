@@ -33,6 +33,7 @@ Main Source file of SPM library
 #include "dbg_log.hpp"
 #include "config.hpp"
 #include "spm_list.hpp"
+#include "sckt_io.hpp"
 
 
 
@@ -144,7 +145,7 @@ GOD DAMN
       defaultConfig.dev_status_mpack = true;
       defaultConfig.debug_log = false;
       defaultConfig.rescrict_time_span = 8;
-      defaultConfig.port = 8080;
+      defaultConfig.port = DEFAULT_PORT;
       defaultConfig.wol_port = 10;
       defaultConfig.user_feedback = false;
       defaultConfig.msgbox_log = true;
