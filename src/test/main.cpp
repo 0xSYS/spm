@@ -29,10 +29,9 @@ void Test1()
 void Test2()
 {
 	std::cout << "Test2() -> SPMWakeOnLan::SndMagicPack()\n";
-	SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
-	//wol.SndMagicPack("6c:f0:49:a1:d9:e6", "192.168.1.255");
-	// 1c:6f:65:c2:e8:2f //g41MT-S2P
-	// 6c:f0:49:a1:d9:e6 // g41M-ES2L
+	SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255"); // //g41MT-S2P
+	//SPMWakeOnLan::SndMagicPack("1c:6f:65:35:48:4a", "192.168.1.255");   // ga-g31M-ES2L (Celeron E3400)
+	//wol.SndMagicPack("6c:f0:49:a1:d9:e6", "192.168.1.255");           // ga-g41M-ES2L
 }
 
 void Test3()
@@ -98,7 +97,8 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	SPM_SocketIO::SndPowerAction(SPM::Restart, "192.168.1.102");
+	// SPM_SocketIO::SndPowerAction(SPM::Restart, "192.168.1.102");
+	SPM_SocketIO::SndPowerAction(SPM::Shutdown, "192.168.1.16");
 	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
@@ -176,8 +176,11 @@ void Test16()
 
 void Test17()
 {
-  SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
-  SPM_SocketIO::ping(50, 1, "192.168.1.102");
+  //SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255");
+  //SPM_SocketIO::ping(50, 1, "192.168.1.102");
+  
+  SPMWakeOnLan::SndMagicPack("1c:6f:65:35:48:4a", "192.168.1.255");
+  SPM_SocketIO::ping(30, 1, "192.168.1.16");
 }
 
 
@@ -200,16 +203,27 @@ void Test18()
 
 void Test19()
 {
-  SPM_SocketIO::ServerSettings mySettings;
-  mySettings.alow_sys_info = false;
-  mySettings.debug_log = false;
-  mySettings.write_log_files = false;
-  mySettings.stdout_capture = false;
-  mySettings.terminate_proceses = false;
-  mySettings.listen_port = 5200;
-  mySettings.skip_proc_scan = false;
-  mySettings.socket_response = false;
-  SPM_SocketIO::SndCustomSettings("192.168.1.102", mySettings);
+  // SPM_SocketIO::ServerSettings mySettings;
+  // mySettings.alow_sys_info = false;
+  // mySettings.debug_log = false;
+  // mySettings.write_log_files = false;
+  // mySettings.stdout_capture = false;
+  // mySettings.terminate_proceses = false;
+  // mySettings.listen_port = 5200;
+  // mySettings.skip_proc_scan = false;
+  // mySettings.socket_response = false;
+  // SPM_SocketIO::SndCustomSettings("192.168.1.102", mySettings);
+  
+  SPM_SocketIO::ServerSettings someOtherSettings;
+  someOtherSettings.alow_sys_info = true;
+  someOtherSettings.debug_log = true;
+  someOtherSettings.write_log_files = true;
+  someOtherSettings.stdout_capture = true;
+  someOtherSettings.terminate_proceses = false;
+  someOtherSettings.listen_port = 5200;
+  someOtherSettings.skip_proc_scan = false;
+  someOtherSettings.socket_response = true;
+  SPM_SocketIO::SndCustomSettings("192.168.1.16", someOtherSettings);
 }
 
 void Test20()
@@ -258,11 +272,11 @@ int main(int argc, char * argv[])
   // Test16();
   // Test17();
   // Test18();
-  // Test19();
+  Test19();
   // Test20();
 #ifdef __linux__
-    //Test21();
+    // Test21();
 #endif
-  Test22();
+  // Test22();
 	return 0;
 }

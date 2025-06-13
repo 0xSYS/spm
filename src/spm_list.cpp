@@ -82,7 +82,7 @@ std::vector <SPMList::device> SPMList::Read(int env_index)
 }
 
 
-void SPMList::Write(int env_index, std::vector<device> l)
+void SPMList::Write(int env_index, const std::vector<device>& l)
 {
   
   // Get the path to the given storage environment

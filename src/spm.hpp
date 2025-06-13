@@ -65,3 +65,26 @@ class SPM
 
 inline std::vector<SPM::envInfo> loaded_envs;
 inline std::vector<SPMList::device> loaded_dev_list;
+
+
+/* 
+[Unit]
+Description=SPM Service
+After=network.target
+
+[Service]
+User=root
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="LD_LIBRARY_PATH=/usr/local/lib:/usr/lib"
+ExecStart=/home/cexdb/spm/build/linux/x86_64/release/spm-serv
+WorkingDirectory=/home/cexdb/spm/build/linux/x86_64/release
+Restart=on-failure
+RestartSec=5
+Type=simple
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+
+ */

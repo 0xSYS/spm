@@ -21,6 +21,6 @@ class SPMList
     }device;
 
     static std::vector <device> Read(int env_index);
-    static void Write(int env_index, std::vector<device> l);
+    static void Write(int env_index, const std::vector<device>& l);
     static void AddNewDev(device);
 };

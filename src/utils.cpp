@@ -263,14 +263,15 @@ void SPMUtils::printConfig(SPMConfig::cfgStruct c)
   << "[INT]  -> last_env_index       = " << c.last_env_index       << "\n";
 }
 
-void SPMUtils::printDevArray(std::vector<SPMList::device> d)
+void SPMUtils::printDevArray(const std::vector<SPMList::device>& d)
 {
   int loop_index = 0;
   for(const auto &dev : d)
   {
     loop_index++;
-    std::cout << "[Loop Index]: " << loop_index
+    std::cout
     << "\n{\n"
+    << "    index: " << loop_index                  << ",\n"
     << "    name: " << dev.name                     << ",\n"
     << "    interface_type: " << dev.interface_type << ",\n"
     << "    hw_address: " << dev.hw_addr            << ",\n"

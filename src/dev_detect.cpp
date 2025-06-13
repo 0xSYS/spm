@@ -37,7 +37,7 @@ std::vector<std::string> SPMDetect::CreateIP_Table()
   
   for(const auto& dev : arp_devices)
   {
-    ipTable.push_back(dev.ip);
+    ipTable.emplace_back(dev.ip);
   }
 #endif
 
@@ -102,7 +102,7 @@ std::vector<SPMDetect::arpDev> SPMDetect::GetArpTable()
         continue;
         
       // Put devices into the vector
-      out_table.push_back({ip, hw_type, flags, mac, device});
+      out_table.emplace_back(arpDev{ip, hw_type, flags, mac, device});
     }
   }
   return out_table;
