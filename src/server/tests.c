@@ -4,6 +4,7 @@
 
 
 #include "dbg.h"
+#include "proc_manager.h"
 
 
 
@@ -78,7 +79,16 @@ void TestingStuff()
   Log(Err, "Error Log");
 }
 
+void ProcScanerTest()
+{
+  //IsRunnningProc("helix");
+  IsRunnningProc("btop");
+  //IsRunnningProc("zsh");
+  //IsRunnningProc("tmux");
+}
+
 void DevTests()
 {
-  // Doing stuff here
+  //TestingStuff();
+  ProcScanerTest();
 }

@@ -7,13 +7,21 @@
 #include <cJSON/cJSON.h>
 
 
+
+//#define DEV_TEST
+
+
+
 #include "dbg.h"
 #include "server.h"
 #include "proc_manager.h"
 #include "power_funcs.h"
 #include "sckt_io.h"
 #include "config.h"
-#include "tests.h"
+
+#ifdef DEV_TEST
+  #include "tests.h"
+#endif
 
 
 
@@ -100,18 +108,11 @@ void ServerSetup()
 
 int main(int argc, char * argv[])
 {
-    // Do stuff here
-  //TestingStuff();
-  //DevTests();
+#ifdef DEV_TEST
+  DevTests();
+#else
   ServerSetup();
   StartScktReception();
-  //jsonTest2();
-    /*
-    CheckRuningProc("helix");
-    CheckRuningProc("zsh");
-    CheckRuningProc("tmux");
-    */
-    // SysReboot();
-    // SysPowerOff();
+#endif
 	return 0;
 }

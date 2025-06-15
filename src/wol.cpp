@@ -145,11 +145,7 @@ void SPMWakeOnLan::SndMagicPack(const std::string& mac_address, const std::strin
     }
     else
     {
-#ifdef ANSI_ESCAPES
-      SPM_LOG(SPMDebug::Success, "Magic packet send successfully to \033[38;5;94m", mac_address, "\033[0m via \033[38;5;94m", broadcast_ip, "\033[0m");
-#else
-      SPM_LOG(SPMDebug::Success, "Magic packet sent successfully to ", mac_address, " via ", broadcast_ip);
-#endif        
+      SPM_LOG(SPMDebug::Success, "Magic packet send successfully to ", ESC_ORANGE_RED, mac_address, ESC_RST, " via ", ESC_ORANGE_RED, broadcast_ip, ESC_RST);       
     }
 
     closesocket(sockt);
@@ -202,11 +198,7 @@ void SPMWakeOnLan::SndMagicPack(const std::string& mac_address, const std::strin
     }
     else
     {
-#ifdef ANSI_ESCAPES
-      SPM_LOG(SPMDebug::Success, "Magic packet sent successfully to \033[38;5;94m", mac_address, "\033[0m via \033[38;5;94m", broadcast_ip, "\033[0m");
-#else
-      SPM_LOG(SPMDebug::Success, "Magic packet sent successfully to ", mac_address, " via ", broadcast_ip);
-#endif            
+      SPM_LOG(SPMDebug::Success, "Magic packet send successfully to ", ESC_ORANGE_RED, mac_address, ESC_RST, " via ", ESC_ORANGE_RED, broadcast_ip, ESC_RST);
     }
     close(sockt);
 #endif

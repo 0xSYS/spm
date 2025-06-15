@@ -13,6 +13,7 @@
 
 
 inline SPMConfig::cfgStruct globalConf;
+inline bool is_spm_init = false;
 
 class SPM
 {
@@ -32,7 +33,11 @@ class SPM
     ForceSleep,
     Standby,
     ForceStandby,
-    Hibernate     // Dosent require forced action as it dosent cause any data loss or corruption (Last state of the os is saved to local storage)
+    Hibernate,     // Dosent require forced action as it dosent cause any data loss or corruption (Last state of the os is saved to local storage)
+    IPMI_Wake       = 0x01,
+    IPMI_HardReset  = 0x03,
+    IPMI_PowerCycle = 0x02,
+    IPMI_PowerOff   = 0x00
   };
   
   
@@ -65,26 +70,3 @@ class SPM
 
 inline std::vector<SPM::envInfo> loaded_envs;
 inline std::vector<SPMList::device> loaded_dev_list;
-
-
-/* 
-[Unit]
-Description=SPM Service
-After=network.target
-
-[Service]
-User=root
-Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-Environment="LD_LIBRARY_PATH=/usr/local/lib:/usr/lib"
-ExecStart=/home/cexdb/spm/build/linux/x86_64/release/spm-serv
-WorkingDirectory=/home/cexdb/spm/build/linux/x86_64/release
-Restart=on-failure
-RestartSec=5
-Type=simple
-StandardOutput=journal
-StandardError=journal
-
-[Install]
-WantedBy=multi-user.target
-
- */

@@ -46,8 +46,26 @@
 
 
 
-
-
+#ifdef ANSI_ESCAPES
+  #define ESC_ORANGE3       "\033[38;5;214m"
+  #define ESC_BRIGHT_RED    "\033[38;5;196m"
+  #define ESC_GRAY62        "\033[38;5;245m"
+  #define ESC_MEDIUM_PURPLE "\033[38;5;105m"
+  #define ESC_KHAKI         "\033[38;5;178m"
+  #define ESC_EMERALD       "\033[38;5;41m"
+  #define ESC_MINT          "\033[38;5;123m"
+  #define ESC_ORANGE_RED    "\033[38;5;202m"
+  #define ESC_RST           "\033[0m"
+#else
+  #define ESC_ORANGE3       ""
+  #define ESC_BRIGHT_RED    ""
+  #define ESC_GRAY62        ""
+  #define ESC_MEDIUM_PURPLE ""
+  #define ESC_KHAKI         ""
+  #define ESC_EMERALD       ""
+  #define ESC_MINT          ""
+  #define ESC_RST           ""
+#endif
 
 #ifdef DEBUG_FN_CALLS
   #if defined(_MSC_VER)
@@ -123,93 +141,57 @@ inline std::vector<std::string> parseCommand(const std::string& command)
 class SPMDebug
 {
   public:
-  enum logTypes
+  enum log_types
   {
-    Info = 1,
+    Info,
     Success,
     Warn,
     Err,
-    noType = 0
+    custom
   };
 
 
   template <typename T, typename... Args>
-  static inline void Log(int logType, std::string fnCall, std::string file, int line, T mainStr, Args... r)
+  static inline void Log(log_types lt, std::string fnCall, std::string file, int line, T mainStr, Args... r)
   {
-    if(logType == 1)
+    if(lt == Info)
     {
-#ifdef ANSI_ESCAPES
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | \033[38;5;245m" << fnCall << "\033[0m} [\033[38;5;123mInfo\033[0m] -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MINT << "Info" << ESC_RST << " -> " << mainStr;
 #else
-      std::cout << "libspm: [\033[38;5;123mInfo\033[0m] -> " << mainStr;
-#endif
-#else
-#ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << fnCall <<  " [Info] -> " << mainStr;
-#else
-      std::cout << "libspm: [Info] -> " << mainStr;
-#endif
+      std::cout << "libpm: [" << ESC_MINT << "Info" << ESC_RST << " -> " << mainStr;
 #endif
     }
-    else if(logType == 2)
+    else if(lt == Success)
     {
-#ifdef ANSI_ESCAPES
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | \033[38;5;245m" << fnCall << "\033[0m} [\033[38;5;41mSuccess !\033[0m] -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_EMERALD << "Success !" << ESC_RST << " -> " << mainStr;
 #else
-      std::cout << "libspm: [\033[38;5;41mSuccess !\033[0m] -> " << mainStr;
-#endif
-#else
-#ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << fnCall <<  " [Success !] -> " << mainStr;
-#else
-      std::cout << "libspm: [Success !] -> " << mainStr;
-#endif
+      std::cout << "libpm: [" << ESC_EMERALD << "Success !" << ESC_RST << " -> " << mainStr;
 #endif
     }
-    else if(logType == 3)
+    else if(lt == Warn)
     {
-#ifdef ANSI_ESCAPES
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | \033[38;5;245m" << fnCall << "\033[0m} [\033[38;5;178mWarn\033[0m] -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_KHAKI << "Warn" << ESC_RST << " -> " << mainStr;
 #else
-      std::cout << "libspm: [\033[38;5;178mWarn\033[0m] -> " << mainStr;
-#endif
-#else
-#ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << fnCall <<  " [Warn] -> " << mainStr;
-#else
-      std::cout << "libspm: [Warn] -> " << mainStr;
-#endif
+      std::cout << "libpm: [" << ESC_KHAKI << "Warn" << ESC_RST << " -> " << mainStr;
 #endif
     }
-    else if(logType == 4)
+    else if(lt == Err)
     {
-#ifdef ANSI_ESCAPES
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | \033[38;5;245m" << fnCall << "\033[0m} [\033[38;5;196mErr\033[0m] -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_BRIGHT_RED << "Err" << ESC_RST << " -> " << mainStr;
 #else
-      std::cout << "libspm: [\033[38;5;123mErr\033[0m] -> " << mainStr;
-#endif
-#else
-#ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << fnCall <<  " [Err] -> " << mainStr;
-#else
-      std::cout << "libspm: [Err] -> " << mainStr;
-#endif
+      std::cout << "libpm: [" << ESC_BRIGHT_RED << "Err" << ESC_RST << " -> " << mainStr;
 #endif
     }
-    else if(logType == 0)
+    else if(lt == custom)
     {
 #ifdef DEBUG_FN_CALLS
-#ifdef ANSI_ESCAPES
-      std::cout << "libspm: {" << file << ":" << line << " | \033[38;5;245m" << fnCall << "\033[0m} [ \033[38;5;105mcustom debug\033[0m ] -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MEDIUM_PURPLE << "custom" << ESC_RST << " -> " << mainStr;
 #else
-      std::cout << "libspm: {" << file << ":" << line << " | " << fnCall << "} [ custom debug ] -> " << mainStr;
-#endif
-#else
-      std::cout << "libspm: [ custom debug ] -> " << mainStr;
+      std::cout << "libpm: [" << ESC_MEDIUM_PURPLE << "custom" << ESC_RST << " -> " << mainStr;
 #endif
     }
     // Forgor to print the rest of the args XD

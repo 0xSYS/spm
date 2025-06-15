@@ -28,6 +28,7 @@ void SPMConfig::Write(cfgStruct cfg_out)
       {
         { "deviceStatus",    cfg_out.dev_status_mpack     },
         { "port",            cfg_out.port                 },
+        { "serverReply",     cfg_out.server_reply         },
         { "wolPort",         cfg_out.wol_port             },
         { "socketCallbacks", cfg_out.power_opts_callbacks },
         { "userFeedback",    cfg_out.user_feedback        }
@@ -97,6 +98,7 @@ SPMConfig::cfgStruct SPMConfig::Read()
   
   cfg_in.dev_status_mpack     = general_obj["deviceStatus"];
   cfg_in.port                 = general_obj["port"];
+  cfg_in.server_reply         = general_obj["serverReply"];
   cfg_in.wol_port             = general_obj["wolPort"];
   cfg_in.power_opts_callbacks = general_obj["socketCallbacks"];
   cfg_in.user_feedback        = general_obj["userFeedback"];

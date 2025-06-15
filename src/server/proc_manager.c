@@ -13,34 +13,34 @@
 
 
 
-pid_t CheckRuningProc(const char * procName)
+
+
+bool IsRunnningProc(const char * proc_name)
 {
-	PROCTAB *procTable = openproc(PROC_FILLSTAT | PROC_FILLSTATUS | PROC_FILLOOM);
-	
-
-	if(!procTable)
-	{
-		Log(Err, "Failed to create process table!");
-		perror("openproc");
-		//return false;
-	}
-	else
-	{
-		proc_t *proc;
-
-		while((proc = readproc(procTable, NULL)) != NULL)
-		{
-			// printf("Runing proc: %s\n", proc -> cmd);
-      if(strstr(proc->cmd, procName))
-      {
-        Log(Info, "Process '%s' is running (PID: %d)\n", procName, proc->tid);
-        return proc -> tid;
-        // freeproc(proc);
-        closeproc(procTable);
-        // return true;
-      }
-      // freeproc(proc);
-	  }
+  bool found = 0;
+  PROCTAB *pt = openproc(PROC_FILLSTAT | PROC_FILLARG);
+  if(!pt)
+  {
+    Log(Err, "Failed to get process table!!!");
+    perror("openproc");
+    found = false;
   }
-  //return NULL;
+  else
+  {
+    proc_t proc;
+    memset(&proc, 0, sizeof(proc));
+    
+    while(readproc(pt, &proc) != NULL)
+    {
+      if(strcmp(proc.cmd, proc_name) == 0)
+      {
+        found = true;
+        Log(Info, "%s is running", proc_name);
+        break;
+      }
+      memset(&proc, 0, sizeof(proc));
+    }
+  }
+  closeproc(pt);
+  return found;
 }

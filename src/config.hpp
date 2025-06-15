@@ -21,6 +21,7 @@ class SPMConfig
 	  typedef struct
 	  {
 	    bool dev_status_mpack;                // Enable / disable device status globally
+	    bool server_reply;                    // Enable / disable server reply expectance
       bool msgbox_log;                      // Enable / disable message boxes
       bool debug_log;                       // Enable / disable debug log to file (logs are stored in /home/user/.spm/logs)
       bool restrict_mode;                   // Enable / disable restriction mode

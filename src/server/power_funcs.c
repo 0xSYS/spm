@@ -108,6 +108,7 @@ void SysAction(enum power_action pa)
 		}
 		else if(pa == Standby)
 		{
+		  // This dosen't seem to be working proberly wtf
 		  r = sd_bus_call_method(bus, "org.freedesktop.login1", "/org/freedesktop/login1", "org.freedesktop.login1.Manager", "Suspend", &error, NULL, "b", 0);
 		}
 		else if(pa == Hibernate)

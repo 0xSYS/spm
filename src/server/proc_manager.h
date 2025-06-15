@@ -7,4 +7,5 @@
 
 
 
-pid_t CheckRuningProc(const char * procName);
+
+bool IsRunnningProc(const char * proc_name);

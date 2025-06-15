@@ -106,13 +106,13 @@ void SPMList::Write(int env_index, const std::vector<device>& l)
     {
       dev_index++;
       json_out.push_back({
-        { "index", dev_index },
-        { "name", dev.name },
+        { "index",         dev_index },
+        { "name",          dev.name },
         { "interfaceType", dev.interface_type },
-        { "hwAddress", dev.hw_addr },
+        { "hwAddress",     dev.hw_addr },
         { "broadcastAddr", dev.broadcast_ip },
-        { "ip", dev.os_ip },
-        { "description", dev.notes }
+        { "ip",            dev.os_ip },
+        { "description",   dev.notes }
       });
     }
     

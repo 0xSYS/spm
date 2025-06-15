@@ -41,7 +41,7 @@ class SPM_SocketIO
 
   typedef struct
   {
-    bool socket_response;    // Enable / disable feedback after sending a packet
+    bool replies;            // Enable / disable feedback after sending a packet
     bool skip_proc_scan;     // Enable / disable scanning the current process list before executing a power action
     bool debug_log;          // Enable / disable general debuging (This also includes sending minimal debug information from server to frontend)
     bool write_log_files;    // Enable / disable writing to log files
@@ -50,6 +50,13 @@ class SPM_SocketIO
     bool terminate_proceses; // Values: Never, Always, Always first
     int listen_port;         // Use different port for sending / recepting the packets
   }ServerSettings;
+  
+  enum prompt_opts
+  {
+    Yes,
+    No,
+    Cacel
+  };
   
   //enum action_type
   //{
@@ -68,8 +75,10 @@ class SPM_SocketIO
     static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
     static void SndPowerAction(SPM::server_actions at, std::string target);       // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
-    static std::string GetServerReplyStr(int s);                                       // [ ] Get the curret replied message from the server
+    static std::string GetServerReplyStr(int s);                                  // [ ] Get the curret replied message from the server
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
+    static void PromptRespond(prompt_opts po);                                    // [ ] Send prompt response to a server
+    static void CancelPrompt(std::string target);                                 // [ ] Cancel the unanswered prompt to a specific server (Unanswered prompts on high priority can prevent the server from accepting any new actions in some cases)
     static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
     static void EnableSSHDaemon(std::string target);                              // [ ] Enable / disable the SSH daemon
     static void CheckRuningService(std::string target, std::string serv_name);    // [ ] Check for any custom runing service

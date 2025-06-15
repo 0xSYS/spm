@@ -136,7 +136,7 @@ GOD DAMN
 #if defined(_WIN32) || defined(_WIN64)
     mainDir << SPMUtils::GetHomeDir() << "\\.spm\\config.json";
 #endif
-    SPM_LOG(SPMDebug::noType, "Main Directory: ", mainDir.str());
+    SPM_LOG(SPMDebug::custom, "Main Directory: ", mainDir.str());
     if(!SPMUtils::checkFile(mainDir.str()))
     {
       //defaultConfig.config_storage = true; // Just stupid. Simply use the nullptr instead
@@ -181,7 +181,7 @@ GOD DAMN
   mainDir << SPMUtils::GetHomeDir() << "\\.spm\\lists\\devices.spmls";
 #endif
 
-	SPM_LOG(SPMDebug::noType, "File path to list: ", mainDir.str());
+	SPM_LOG(SPMDebug::custom, "File path to list: ", mainDir.str());
 	if(SPMUtils::checkFile(mainDir.str()) == false)
 	{
 	  SPM_LOG(SPMDebug::Warn, "No main list has beed found");
@@ -190,6 +190,7 @@ GOD DAMN
 	{
 	  // Parse the main list
 	}
+	is_spm_init = true;
 }
 
 /*

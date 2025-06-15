@@ -67,102 +67,108 @@ unsigned short checksum(void *b, int len)
 bool sockInit(SPM_SOCKET &s, std::string ip)
 {
   struct sockaddr_in serv_addr;
-
-  s = socket(AF_INET, SOCK_STREAM, 0);
-
-  if(s < 0)
+  if(globalConf.port == 0 || is_spm_init == false)
   {
-    SPM_LOG(SPMDebug::Err, "Failed to create socket !!");
-#ifndef NO_MSGBOX
-    SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to create socket !!!");
-    
-    return false;
-#endif
-  }
-  else
-  {
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(globalConf.port);
-
-
-    if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
-    {
-      SPM_LOG(SPMDebug::Err, "Invalid Address !!");
-#ifndef NO_MSGBOX
-      SPMDebug::MsgBoxLog(SPMDebug::Err, "Address '", ip, "' is invalid !!!");
-#endif
-      return false;
-    }
-    else
-    {
-      if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-      {
-        SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
-#ifndef NO_MSGBOX
-        SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
-#endif
-        return false;
-      }
-    }
-    return true;
-  }
-
-#if defined(_WIN32) || defined(_WIN64)
-  // Todo rn
-  WSADATA wsaData;
-  
-  if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-  {
-    SPM_LOG(SPMDebug::Err, "WSAStartup() Failed !!!");
+    SPM_LOG(SPMDebug::Err, "SPM was not initialized !!! Missing socket port!!!");
     return false;
   }
   else
   {
     s = socket(AF_INET, SOCK_STREAM, 0);
-    
-    if(s == INVALID_SOCKET)
+
+    if(s < 0)
     {
-      SPM_LOG(SPMDebug::Err, "Failed to create socket !!!");
+      SPM_LOG(SPMDebug::Err, "Failed to create socket !!");
 #ifndef NO_MSGBOX
       SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to create socket !!!");
-#endif
-      WSACleanup();
+    
       return false;
+#endif
     }
     else
     {
       serv_addr.sin_family = AF_INET;
-      serv_addr.sin_port = htons(DEFAULT_PORT);
+      serv_addr.sin_port = htons(globalConf.port);
 
-      // inet_pton is available in ws2tcpip.h on Windows
-      if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
+
+      if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
       {
         SPM_LOG(SPMDebug::Err, "Invalid Address !!");
 #ifndef NO_MSGBOX
         SPMDebug::MsgBoxLog(SPMDebug::Err, "Address '", ip, "' is invalid !!!");
 #endif
-        closesocket(s);
+        return false;
+      }
+      else
+      {
+        if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+          SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
+#ifndef NO_MSGBOX
+        SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
+#endif
+        return false;
+        }
+      }
+      return true;
+    }
+
+#if defined(_WIN32) || defined(_WIN64)
+    WSADATA wsaData;
+    
+    if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
+      SPM_LOG(SPMDebug::Err, "WSAStartup() Failed !!!");
+      return false;
+    }
+    else
+    {
+      s = socket(AF_INET, SOCK_STREAM, 0);
+      
+      if(s == INVALID_SOCKET)
+      {
+        SPM_LOG(SPMDebug::Err, "Failed to create socket !!!");
+#ifndef NO_MSGBOX
+        SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to create socket !!!");
+#endif
         WSACleanup();
         return false;
       }
       else
       {
-        if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(globalConf.port);
+
+        // inet_pton is available in ws2tcpip.h on Windows
+        if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
         {
-          SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
+          SPM_LOG(SPMDebug::Err, "Invalid Address !!");
 #ifndef NO_MSGBOX
-          SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
+          SPMDebug::MsgBoxLog(SPMDebug::Err, "Address '", ip, "' is invalid !!!");
 #endif
           closesocket(s);
           WSACleanup();
           return false;
         }
-      }
-      WSACleanup();
-      return true;
-    }
-  }
+        else
+        {
+          if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
+          {
+            SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
+#ifndef NO_MSGBOX
+            SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
 #endif
+            closesocket(s);
+            WSACleanup();
+            return false;
+          }
+        }
+        WSACleanup();
+        return true;
+      }
+    }
+#endif
+  }
 }
 
 
@@ -208,7 +214,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
   
   if(count == 0)
   {
-    SPM_LOG(SPMDebug::Info, "Infinite pinging.");
+    SPM_LOG(SPMDebug::Info, "Infinite pinging: ", ESC_ORANGE3, ip, ESC_RST);
     int seq = 0;
     while(true)
     {
@@ -252,11 +258,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
         {
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double, std::milli> elapsed = end - start;
-#ifdef ANSI_ESCAPES
-          SPM_LOG(SPMDebug::Success, "seq: ", seq+1, " | Got reply from \033[38;5;214m", ip, "\033[0m in ", elapsed.count(), " ms");
-#else
-          SPM_LOG(SPMDebug::Success, "seq: ", seq+1, " | Got reply from ", ip, " in ", elapsed.count(), " ms");
-#endif
+          SPM_LOG(SPMDebug::Success, "seq: ", seq+1, " | Got reply from ", ESC_ORANGE3, ip, ESC_RST, " in ", elapsed.count(), " ms");
           replies++;
         }
       }
@@ -311,11 +313,7 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
         {
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double, std::milli> elapsed = end - start;
-#ifdef ANSI_ESCAPES
-          SPM_LOG(SPMDebug::Success, "seq: ", j+1, " / ", count, " | Got reply from \033[38;5;214m", ip, "\033[0m in ", elapsed.count(), " ms");
-#else
-          SPM_LOG(SPMDebug::Success, "seq: ", j+1, " / ", count, " | Got reply from ", ip, " in ", elapsed.count(), " ms");
-#endif
+          SPM_LOG(SPMDebug::Success, "seq: ", j+1, " / ", count, " | Got reply from ", ESC_ORANGE3, ip, ESC_RST, " in ", elapsed.count(), " ms");
           replies++;
         }
       }
@@ -554,12 +552,8 @@ void SPM_SocketIO::SndPowerAction(SPM::server_actions serv_act, std::string targ
       received_msg.push_back('\n');
     }
     CloseSPM_Socket(sckt);
-    
-#ifdef ANSI_ESCAPES
-    SPM_LOG(SPMDebug::Info, "Server replied from: \033[38;5;214m", target, "\033[0m with message: ", received_msg);
-#else
-    SPM_LOG(SPMDebug::Info, "Server replied from: ", target, " with message: ", received_msg);
-#endif
+
+    SPM_LOG(SPMDebug::Info, "Server replied from: ", ESC_ORANGE3, target, ESC_RST, " with message: ", received_msg);
   }
   else
   {
@@ -576,7 +570,7 @@ void SPM_SocketIO::SndCustomSettings(std::string target, ServerSettings ss)
   if(sockInit(sckt, target))
   {
     // Constructing the settings packet
-    serialSettings << "customSettings: scktResp=" << ss.socket_response    << " allowSysInfo="  << ss.alow_sys_info;
+    serialSettings << "customSettings: scktResp=" << ss.replies            << " allowSysInfo="  << ss.alow_sys_info;
     serialSettings << " dbgLog="                  << ss.debug_log          << " port="          << ss.listen_port;
     serialSettings << " skipProcScan="            << ss.skip_proc_scan     << " stdoutCapture=" << ss.stdout_capture;
     serialSettings << " terminateProcesses="      << ss.terminate_proceses << " writeLogFiles=" << ss.write_log_files;

@@ -29,8 +29,8 @@ void Test1()
 void Test2()
 {
 	std::cout << "Test2() -> SPMWakeOnLan::SndMagicPack()\n";
-	SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255"); // //g41MT-S2P
-	//SPMWakeOnLan::SndMagicPack("1c:6f:65:35:48:4a", "192.168.1.255");   // ga-g31M-ES2L (Celeron E3400)
+	// SPMWakeOnLan::SndMagicPack("1c:6f:65:c2:e8:2f", "192.168.1.255"); // //g41MT-S2P
+	SPMWakeOnLan::SndMagicPack("1c:6f:65:35:48:4a", "192.168.1.255");   // ga-g31M-ES2L (Celeron E3400)
 	//wol.SndMagicPack("6c:f0:49:a1:d9:e6", "192.168.1.255");           // ga-g41M-ES2L
 }
 
@@ -97,8 +97,8 @@ void Test8()
 void Test9()
 {
 	std::cout << "Power actions test\n";
-	// SPM_SocketIO::SndPowerAction(SPM::Restart, "192.168.1.102");
-	SPM_SocketIO::SndPowerAction(SPM::Shutdown, "192.168.1.16");
+	SPM_SocketIO::SndPowerAction(SPM::Shutdown, "192.168.1.102");
+	// SPM_SocketIO::SndPowerAction(SPM::Shutdown, "192.168.1.16");
 	//SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, "192.168.1.34");
 }
 
@@ -171,7 +171,7 @@ void Test15()
 
 void Test16()
 {
-  SPM_SocketIO::ping(50, 1, "192.168.1.102");
+  SPM_SocketIO::ping(50, 1, "192.168.1.16");
 }
 
 void Test17()
@@ -222,7 +222,7 @@ void Test19()
   someOtherSettings.terminate_proceses = false;
   someOtherSettings.listen_port = 5200;
   someOtherSettings.skip_proc_scan = false;
-  someOtherSettings.socket_response = true;
+  someOtherSettings.replies = true;
   SPM_SocketIO::SndCustomSettings("192.168.1.16", someOtherSettings);
 }
 
@@ -254,12 +254,12 @@ void Test22()
 int main(int argc, char * argv[])
 {
 	std::cout << "- - - - SPM BACKEND TESTS - - - - \n\n\n\n";
-	// Test1(); // Linux Pass
+	Test1(); // Linux Pass
 	// Test2(); // Linux, Windows Pass
 	// Test3(); // 
 	// Test4(); // All pass
 	// Test5();
-  // Test6();
+  Test6();
 	// Test7();
 	// Test8();
   // Test9();
@@ -272,7 +272,7 @@ int main(int argc, char * argv[])
   // Test16();
   // Test17();
   // Test18();
-  Test19();
+  // Test19();
   // Test20();
 #ifdef __linux__
     // Test21();
