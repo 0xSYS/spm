@@ -59,13 +59,14 @@ class SPM_SocketIO
   };
   
     static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
-    static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
+    static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing (In progress)
     static void SndPowerAction(SPM::server_actions at, std::string target);       // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
     static std::string GetServerReplyStr(int s);                                  // [ ] Get the curret replied message from the server
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
     static void PromptRespond(prompt_opts po);                                    // [ ] Send prompt response to a server
-    static void CancelPrompt(std::string target);                                 // [ ] Cancel the unanswered prompt to a specific server (Unanswered prompts on high priority can prevent the server from accepting any new actions in some cases)
+    static void ListActivePrompts(std::string target);                            // [ ] List unanswered prompts
+    static void CancelAllPrompts(std::string target);                             // [ ] Cancel the unanswered prompt to a specific server (Unanswered prompts on high priority can prevent the server from accepting any new actions in some cases)
     static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
     static ServerSettings GetServerSettings(std::string target);                  // [ ] Get the settings from a specific server
     static void EnableSSHDaemon(std::string target);                              // [ ] Enable / disable the SSH daemon

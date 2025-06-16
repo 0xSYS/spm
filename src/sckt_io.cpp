@@ -461,7 +461,12 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 #endif
 }
 
-
+/* 
+Fuuckk from here the approach is simply THE WORST
+**You don't initialize, send and close a godamn socket everytime when sending packets to the server**
+WTF I noticed this very late and it rly dosen't make sense + performance is actually fucked up
+Also I gotta replace send() with sendto() so no connection / reconnection is required
+*/
 std::string SPM_SocketIO::GetServerReplyStr(int s)
 {
   std::string out;

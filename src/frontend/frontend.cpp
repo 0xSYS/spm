@@ -521,7 +521,7 @@ void MyFrame::SendOnSignal(wxCommandEvent& event)
 void MyFrame::OnPoweroffClick(wxCommandEvent& event)
 {
     wxString dev_ip = deviceGrid->GetCellValue(selrow, 1);
-    SPM_SocketIO::SndPowerAction(SPM_SocketIO::Poweroff, dev_ip.ToStdString());
+    SPM_SocketIO::SndPowerAction(SPM::Shutdown, dev_ip.ToStdString());
     // wxMessageBox("Signal has been sent successfully !", "Signal poweroff", wxOK || wxICON_INFORMATION);
 }
 
@@ -529,7 +529,7 @@ void MyFrame::OnRebootClick(wxCommandEvent& event)
 {
     wxString dev_ip = deviceGrid->GetCellValue(selrow, 1);
     std::cout << "IP: " << dev_ip.ToStdString() << "\n";
-    SPM_SocketIO::SndPowerAction(SPM_SocketIO::Reboot, dev_ip.ToStdString());
+    SPM_SocketIO::SndPowerAction(SPM::Restart, dev_ip.ToStdString());
     // wxMessageBox("Signal has been sent succesfully!", "Signal reboot", wxOK | wxICON_INFORMATION);
 }
 

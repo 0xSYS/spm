@@ -14,6 +14,7 @@
 
 inline SPMConfig::cfgStruct globalConf;
 inline bool is_spm_init = false;
+inline bool is_socket_init = false;
 
 class SPM
 {
