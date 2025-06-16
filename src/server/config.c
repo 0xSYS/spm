@@ -19,7 +19,6 @@ config current_conf;
 
 config ReadConfig()
 {
-  Log(Info, "Reading config");
   config res_conf;
   FILE * in_file = fopen(dir_path, "r");
   
@@ -54,7 +53,7 @@ config ReadConfig()
       const cJSON *skip_proc_scan = cJSON_GetObjectItemCaseSensitive(root, "skipProcessScanning");
       const cJSON *term_proc      = cJSON_GetObjectItemCaseSensitive(root, "terminateProcs");
       const cJSON *stdout_capt    = cJSON_GetObjectItemCaseSensitive(root, "stdoutCapture");
-      const cJSON *sock_resp      = cJSON_GetObjectItemCaseSensitive(root, "socketResponse");
+      const cJSON *sock_resp      = cJSON_GetObjectItemCaseSensitive(root, "replies");
       const cJSON *port           = cJSON_GetObjectItemCaseSensitive(root, "port");
       
       if(cJSON_IsBool(allow_sys_info))
@@ -116,7 +115,7 @@ void WriteConfig(config cfg)
   cJSON_AddBoolToObject(root, "skipProcessScanning", cfg.skip_proc_scan);
   cJSON_AddBoolToObject(root, "terminateProcs",      cfg.terminate_processes);
   cJSON_AddBoolToObject(root, "stdoutCapture",       cfg.stdout_capture);
-  cJSON_AddBoolToObject(root, "socketResponse",      cfg.socket_response);
+  cJSON_AddBoolToObject(root, "replies",             cfg.socket_response);
   cJSON_AddNumberToObject(root, "port",              cfg.port);
   
   char *json_string = cJSON_Print(root);
@@ -140,6 +139,6 @@ void PrintConfig(config cfg)
   printf("[BOOL] - skip_proc_scan:      %d\n", cfg.skip_proc_scan);
   printf("[BOOL] - terminate_processes: %d\n", cfg.terminate_processes);
   printf("[BOOL] - stdout_capture:      %d\n", cfg.stdout_capture);
-  printf("[BOOL] - socket_response:     %d\n", cfg.socket_response);
+  printf("[BOOL] - replies:             %d\n", cfg.socket_response);
   printf("[INT]  - port:                %d\n", cfg.port);
 }

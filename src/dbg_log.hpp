@@ -157,7 +157,7 @@ class SPMDebug
     if(lt == Info)
     {
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MINT << "Info" << ESC_RST << " -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MINT << "Info" << ESC_RST << "] -> " << mainStr;
 #else
       std::cout << "libpm: [" << ESC_MINT << "Info" << ESC_RST << " -> " << mainStr;
 #endif
@@ -165,7 +165,7 @@ class SPMDebug
     else if(lt == Success)
     {
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_EMERALD << "Success !" << ESC_RST << " -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_EMERALD << "Success !" << ESC_RST << "] -> " << mainStr;
 #else
       std::cout << "libpm: [" << ESC_EMERALD << "Success !" << ESC_RST << " -> " << mainStr;
 #endif
@@ -173,7 +173,7 @@ class SPMDebug
     else if(lt == Warn)
     {
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_KHAKI << "Warn" << ESC_RST << " -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_KHAKI << "Warn" << ESC_RST << "] -> " << mainStr;
 #else
       std::cout << "libpm: [" << ESC_KHAKI << "Warn" << ESC_RST << " -> " << mainStr;
 #endif
@@ -181,7 +181,7 @@ class SPMDebug
     else if(lt == Err)
     {
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_BRIGHT_RED << "Err" << ESC_RST << " -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_BRIGHT_RED << "Err" << ESC_RST << "] -> " << mainStr;
 #else
       std::cout << "libpm: [" << ESC_BRIGHT_RED << "Err" << ESC_RST << " -> " << mainStr;
 #endif
@@ -189,7 +189,7 @@ class SPMDebug
     else if(lt == custom)
     {
 #ifdef DEBUG_FN_CALLS
-      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MEDIUM_PURPLE << "custom" << ESC_RST << " -> " << mainStr;
+      std::cout << "libspm: {" << file << ":" << line << " | " << ESC_GRAY62 << fnCall << ESC_RST << "}" << "[" << ESC_MEDIUM_PURPLE << "custom" << ESC_RST << "] -> " << mainStr;
 #else
       std::cout << "libpm: [" << ESC_MEDIUM_PURPLE << "custom" << ESC_RST << " -> " << mainStr;
 #endif

@@ -259,10 +259,10 @@ int main(int argc, char * argv[])
 	// Test3(); // 
 	// Test4(); // All pass
 	// Test5();
-  Test6();
+  // Test6();
 	// Test7();
 	// Test8();
-  // Test9();
+  Test9();
   // Test10();
   // Test11();
   // Test12();

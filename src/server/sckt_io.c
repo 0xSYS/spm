@@ -151,7 +151,11 @@ void SndReply(int s, enum reply_type rt, const char * msg_fmt, ...)
   va_end(args);
   
   // Constructing the reply packets depending on the choosen reply type
-  if(rt == repl_success)
+  if(rt == repl_info)
+  {
+    written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> info: %s", msg_buf);
+  }
+  else if(rt == repl_success)
   {
     written_buf = snprintf(full_buf, sizeof(full_buf), "[spm-serv] -> success: %s", msg_buf);
   }
@@ -179,7 +183,7 @@ void SndReply(int s, enum reply_type rt, const char * msg_fmt, ...)
 
 void StartScktReception()
 {
-  int serv_fd, sckt;
+  int serv_fd;
   struct sockaddr_in addr;
 
 

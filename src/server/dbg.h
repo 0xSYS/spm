@@ -4,7 +4,7 @@
 
 
 
-enum LogTypes
+enum log_types
 {
   Info = 1,
   Success,
@@ -13,4 +13,4 @@ enum LogTypes
 };
 
 
-void Log(int logType, const char * fmt, ...);
+void Log(enum log_types lt, const char * fmt, ...);

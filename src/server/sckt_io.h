@@ -6,8 +6,12 @@
 #define DEFAULT_PORT 8124
 
 
+static int sckt;
+
+
 enum reply_type
 {
+  repl_info,
   repl_success,
   repl_warn,
   repl_failure,

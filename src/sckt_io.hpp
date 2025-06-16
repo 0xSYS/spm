@@ -58,19 +58,6 @@ class SPM_SocketIO
     Cacel
   };
   
-  //enum action_type
-  //{
-  //  Poweroff = 1,
-  //  ForcePoweroff, // The forced power actions should be avoided from being used as they can cause system corruptions if not handeled carefully
-  //  Reboot,
-  //  ForceReboot,
-  //  Standby,
-  //  ForceStandby,
-  //  Sleep,
-  //  ForceSleep,
-  //  Hibernate
-  //};
-  
     static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
     static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing
     static void SndPowerAction(SPM::server_actions at, std::string target);       // [*] Send power action to a device (Poweroff / reboot)
@@ -80,6 +67,7 @@ class SPM_SocketIO
     static void PromptRespond(prompt_opts po);                                    // [ ] Send prompt response to a server
     static void CancelPrompt(std::string target);                                 // [ ] Cancel the unanswered prompt to a specific server (Unanswered prompts on high priority can prevent the server from accepting any new actions in some cases)
     static bool IsSSH_Ready(std::string target);                                  // [ ] Checks if SSH daemon runs (which means the host computer / server is ready for ssh connections)
+    static ServerSettings GetServerSettings(std::string target);                  // [ ] Get the settings from a specific server
     static void EnableSSHDaemon(std::string target);                              // [ ] Enable / disable the SSH daemon
     static void CheckRuningService(std::string target, std::string serv_name);    // [ ] Check for any custom runing service
     static void AddProtectedProc(std::string target, std::string proc);           // [*] Prevents server restart / poweroff if a specific process is runing
@@ -92,4 +80,5 @@ class SPM_SocketIO
     static void SndStopServer(std::string target);                                // [*] Stops the server from listening
     static void SndResumeServer(std::string target);                              // [*] Resume the server
     static void SndKillServer(std::string target);                                // [*] Kill the server process
+    static void SndKillRunningProc(std::string proc_name, std::string target);    // [ ] Kill a running process on a specific server
 };

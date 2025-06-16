@@ -740,6 +740,58 @@ void SPM_SocketIO::SndResumeServer(std::string target)
   }
 }
 
+bool SPM_SocketIO::InternalPing(int count, int delay, std::string ip)
+{
+
+
+  /*
+  Veeryy wip rn
+  */
+  bool out;
+  SPM_SOCKET sckt;
+  const char * packet = "SpmPing";
+
+
+  if(delay << 1)
+  {
+    SPM_LOG(SPMDebug::Err, "Delay cannot be smaller than 1 second.");
+    SPM_LOG(SPMDebug::Info, "Setting delay to 1 second.");
+    delay = 1;
+  }
+
+  if(sockInit(sckt, ip))
+  {
+    if(count == 0)
+    {
+      SPM_LOG(SPMDebug::Info, "Infinite pinging with custom packet: ", ip);
+      while(true)
+      {
+        std::this_thread::sleep_for(std::chrono::seconds(delay));
+        send(sckt, packet, strlen(packet), 0);
+      }
+    }
+    else if(count << 0)
+    {
+      for(int i = 0; i < count; i++)
+      {
+        std::this_thread::sleep_for(std::chrono::seconds(delay));
+        send(sckt, packet, strlen(packet), 0);
+        SPM_LOG(SPMDebug::Info, "Ping count: ", i);
+      }
+    }
+    // send(sckt, packet, strlen(packet), 0);
+    CloseSPM_Socket(sckt);
+  }
+  else
+  {
+    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
+    CloseSPM_Socket(sckt);
+  }
+
+
+  return out; 
+}
+
 void SPM_SocketIO::SndKillServer(std::string target)
 {
   SPM_SOCKET sckt = 0;

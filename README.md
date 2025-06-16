@@ -20,9 +20,9 @@ A set software components designed for managing computers / servers with support
 * Features
 - [X] Basic wake on lan function
 - [X] Device list
-- [X] Power off along side wake on lan via server listener (In progress)
+- [X] Power off, reboot, sleep, standby, hibernate along side wake on lan
 - [X] Get IP table
-- [ ] Automatic detection of avaialble computers / servers (Works only on windows)
+- [X] Automatic detection of avaialble computers / servers (Works only on windows)
 - [ ] Storage environment (In progress)
 - [ ] Power Status Check
 - [ ] Frontend GUI (Already in rpogress)
@@ -35,7 +35,7 @@ A set software components designed for managing computers / servers with support
 - [ ] Saving power statistics
 - [ ] Custom json written device / server lists
 - [ ] Local web page setup
-- [ ] C/C++ API examples (In progress)
+- [ ] C/C++ API examples
 
 * Compatibility
 - [X] Wake On LAN protocol
