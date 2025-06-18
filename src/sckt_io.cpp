@@ -64,115 +64,65 @@ unsigned short checksum(void *b, int len)
   return result;
 }
 
-bool sockInit(SPM_SOCKET &s, std::string ip)
+bool SPM_SocketIO::sockInit(SPM_SOCKET &s)
 {
-  struct sockaddr_in serv_addr;
-  if(globalConf.port == 0 || is_spm_init == false)
+#ifdef __linux__
+  s = socket(AF_INET, SOCK_DGRAM, 0);
+  if(s < 0)
   {
-    SPM_LOG(SPMDebug::Err, "SPM was not initialized !!! Missing socket port!!!");
+    SPM_LOG(SPMDebug::Err, "Failed to create socket !!!");
+    perror("socket");
     return false;
   }
   else
   {
-    s = socket(AF_INET, SOCK_STREAM, 0);
-
-    if(s < 0)
-    {
-      SPM_LOG(SPMDebug::Err, "Failed to create socket !!");
-#ifndef NO_MSGBOX
-      SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to create socket !!!");
-    
-      return false;
+    return true;
+  }
 #endif
-    }
-    else
-    {
-      serv_addr.sin_family = AF_INET;
-      serv_addr.sin_port = htons(globalConf.port);
-
-
-      if(inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
-      {
-        SPM_LOG(SPMDebug::Err, "Invalid Address !!");
-#ifndef NO_MSGBOX
-        SPMDebug::MsgBoxLog(SPMDebug::Err, "Address '", ip, "' is invalid !!!");
-#endif
-        return false;
-      }
-      else
-      {
-        if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-        {
-          SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
-#ifndef NO_MSGBOX
-        SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
-#endif
-        return false;
-        }
-      }
-      return true;
-    }
 
 #if defined(_WIN32) || defined(_WIN64)
-    WSADATA wsaData;
-    
-    if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-    {
-      SPM_LOG(SPMDebug::Err, "WSAStartup() Failed !!!");
-      return false;
-    }
-    else
-    {
-      s = socket(AF_INET, SOCK_STREAM, 0);
-      
-      if(s == INVALID_SOCKET)
-      {
-        SPM_LOG(SPMDebug::Err, "Failed to create socket !!!");
-#ifndef NO_MSGBOX
-        SPMDebug::MsgBoxLog(SPMDebug::Err, "Failed to create socket !!!");
+  WSADATA wsaData;
+  int result;
+  
+  result = WSAStartup(MAKEWORD(2,2), &wsaData);
+  if(result != 0)
+  {
+    printf("WSAStartup failed: %d\n", result);
+    return false;
+  }
+  
+  s = socket(AF_INET, SOCK_DGRAM, 0);
+  if(sockfd == INVALID_SOCKET)
+  {
+    SPM_LOG(SPMDebug::Err, "Failed to create socket | Last WSA Err: ", WSAGetLastError());
+    WSACleanup();
+    return false;
+  }
+  else
+  {
+    WSAGetLastError();
+  }
 #endif
-        WSACleanup();
-        return false;
-      }
-      else
-      {
-        serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = htons(globalConf.port);
+}
 
-        // inet_pton is available in ws2tcpip.h on Windows
-        if (inet_pton(AF_INET, ip.c_str(), &serv_addr.sin_addr) <= 0)
-        {
-          SPM_LOG(SPMDebug::Err, "Invalid Address !!");
-#ifndef NO_MSGBOX
-          SPMDebug::MsgBoxLog(SPMDebug::Err, "Address '", ip, "' is invalid !!!");
-#endif
-          closesocket(s);
-          WSACleanup();
-          return false;
-        }
-        else
-        {
-          if(connect(s, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR)
-          {
-            SPM_LOG(SPMDebug::Err, "Failed to connect to ", ip);
-#ifndef NO_MSGBOX
-            SPMDebug::MsgBoxLog(SPMDebug::Err, "Connection to'", ip, "' has failed !!!");
-#endif
-            closesocket(s);
-            WSACleanup();
-            return false;
-          }
-        }
-        WSACleanup();
-        return true;
-      }
-    }
-#endif
+void SPM_SocketIO::addressSetup(struct sockaddr_in *addr, std::string ip, int port)
+{
+  memset(addr, 0, sizeof(*addr));
+  addr->sin_family = AF_INET;
+  addr->sin_port = htons(port);
+  
+  int ret = inet_pton(AF_INET, ip.c_str(), &addr->sin_addr);
+  if(ret <= 0)
+  {
+    // ret == 0: Not in presentation format
+    // ret == -1: Invalid address family
+    //throw std::runtime_error("Invalid IP address: " + ip);
+    SPM_LOG(SPMDebug::Err, "Invalid IP address: ", ip);
   }
 }
 
 
-void CloseSPM_Socket(SPM_SOCKET s)
+void SPM_SocketIO::CloseSPM_Socket(SPM_SOCKET s)
 {
 #if defined(_WIN32) || defined(_WIN64)
   closesocket(s);
@@ -461,18 +411,14 @@ bool SPM_SocketIO::ping(int count, int delay, std::string ip)
 #endif
 }
 
-/* 
-Fuuckk from here the approach is simply THE WORST
-**You don't initialize, send and close a godamn socket everytime when sending packets to the server**
-WTF I noticed this very late and it rly dosen't make sense + performance is actually fucked up
-Also I gotta replace send() with sendto() so no connection / reconnection is required
-*/
-std::string SPM_SocketIO::GetServerReplyStr(int s)
+std::string SPM_SocketIO::GetServerReplyStr(int s, struct sockaddr_in serv_addr)
 {
   std::string out;
   int recv_bytes;
   
-  recv_bytes = recv(s, repl_buf, sizeof(repl_buf), 0);
+  socklen_t addrlen = sizeof(serv_addr);
+  
+  recv_bytes = recvfrom(s, repl_buf, sizeof(repl_buf)-1, 0, (struct sockaddr*)&serv_addr, &addrlen);
   
   if(recv_bytes > 0)
   {
@@ -494,254 +440,248 @@ std::string SPM_SocketIO::GetServerReplyStr(int s)
 
 void SPM_SocketIO::SndPowerAction(SPM::server_actions serv_act, std::string target)
 {
-  SPM_SOCKET sckt = 0;
   std::string received_msg;
   int recv_byte;
-  if(sockInit(sckt, target))
+  struct sockaddr_in addr;
+  if(is_spm_init)
   {
+    addressSetup(&addr, target, globalConf.port);
     if(serv_act == SPM::Shutdown)
     {
-      send(sckt, "pwroff", strlen("pwroff"), 0);
+      sendto(main_socket, "pwroff", strlen("pwroff"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Info, "Poweroff sent to ", target);
       
       // Try to get erver reply
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceShutdown)
     {
-      send(sckt, "fpwroff", strlen("fpwroff"), 0);
+      sendto(main_socket, "fpwroff", strlen("fpwroff"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Warn, "Forced Poweroff sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Restart)
     {
-      send(sckt, "rbt", strlen("rbt"), 0);
+      sendto(main_socket, "rbt", strlen("rbt"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Info, "Reboot sent to ", target);
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceRestart)
     {
-      send(sckt, "frbt", strlen("frbt"), 0);
+      sendto(main_socket, "frbt", strlen("frbt"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Warn, "Forced Reboot sent to ", target, " THIS CAN CAUSE SYSTEM CORRUPTION IF NOT CAREFULLY HANDELED !!!");
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Standby)
     {
-      send(sckt, "stby", strlen("stby"), 0);
+      sendto(main_socket, "stby", strlen("stby"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Info, "Standby sent to ", target);
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::ForceStandby)
     {
-      send(sckt, "fstby", strlen("fstby"), 0);
+      sendto(main_socket, "fstby", strlen("fstby"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Info, "Forced Standby sent to ", target);
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
     else if(serv_act == SPM::Hibernate)
     {
-      send(sckt, "hiber", strlen("hiber"), 0);
+      sendto(main_socket, "hiber", strlen("hiber"), 0, (struct sockaddr*)&addr, sizeof(addr));
       SPM_LOG(SPMDebug::Info, "Hibernate sent to ", target);
       
-      received_msg = GetServerReplyStr(sckt);
+      received_msg = GetServerReplyStr(main_socket, addr);
       received_msg.push_back('\n');
     }
-    CloseSPM_Socket(sckt);
 
     SPM_LOG(SPMDebug::Info, "Server replied from: ", ESC_ORANGE3, target, ESC_RST, " with message: ", received_msg);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    close(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not initialized !!!");
+    //close(sckt);
   }
 }
 
 void SPM_SocketIO::SndCustomSettings(std::string target, ServerSettings ss)
 {
-  SPM_SOCKET sckt = 0;
+  //SPM_SOCKET sckt = 0;
+  struct sockaddr_in addr;
   std::ostringstream serialSettings; // Used for constructing the serialised server settings packet
 
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
     // Constructing the settings packet
     serialSettings << "customSettings: scktResp=" << ss.replies            << " allowSysInfo="  << ss.alow_sys_info;
     serialSettings << " dbgLog="                  << ss.debug_log          << " port="          << ss.listen_port;
     serialSettings << " skipProcScan="            << ss.skip_proc_scan     << " stdoutCapture=" << ss.stdout_capture;
     serialSettings << " terminateProcesses="      << ss.terminate_proceses << " writeLogFiles=" << ss.write_log_files;
+    
+    addressSetup(&addr, target, globalConf.port);
 
     // Sending the packet to the desired target
-    send(sckt, serialSettings.str().c_str(), strlen(serialSettings.str().c_str()), 0);
+    sendto(main_socket, serialSettings.str().c_str(), strlen(serialSettings.str().c_str()), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Info, "Sent custom settings");
-    CloseSPM_Socket(sckt);
     
+    /*
+    Todo: Get server reply to check if server settings got saved 
+    */
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::SndResetSettings(std::string target)
 {
-  SPM_SOCKET sckt = 0;
+  //SPM_SOCKET sckt = 0;
+  struct sockaddr_in addr;
   const char * packet_str = "RstSettings";
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-    send(sckt, packet_str, strlen(packet_str), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet_str, strlen(packet_str), 0, (struct sockaddr*)&addr, sizeof(addr));
     // Todo: Get feddback check from server to spm client if this action executed successfully
     SPM_LOG(SPMDebug::Success, "Server settings reset");
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::SndClearLogs(std::string target)
 {
-  SPM_SOCKET sckt = 0;
-  
+  struct sockaddr_in addr;
   const char * packet_str = "clrLogs";
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-  
-    send(sckt, "clrLogs", strlen("clrLogs"), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet_str, strlen(packet_str), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "Sent clear logs");
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 // AddProtectedProc
 void SPM_SocketIO::AddProtectedProc(std::string target, std::string proc)
 {
-  SPM_SOCKET sckt = 0;
+  struct sockaddr_in addr;
   std::ostringstream packet;
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
     packet << "NewProtectedProc=" << proc;
-    send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet.str().c_str(), strlen(packet.str().c_str()), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "Protected process was successfuly sent to ", target);
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::RemoveProtectedProc(std::string target, std::string proc)
 {
-  SPM_SOCKET sckt = 0;
+  struct sockaddr_in addr;
   std::ostringstream packet;
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
     packet << "RemoveProtectedProc=" << proc;
-    send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet.str().c_str(), strlen(packet.str().c_str()), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "New protected process was successfully removed from ", target);
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::AddUnauthorizedProc(std::string target, std::string proc)
 {
-  SPM_SOCKET sckt = 0;
+  struct sockaddr_in addr;
   std::ostringstream packet;
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
     packet << "AddUnauthorizedProc=" << proc;
-    send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet.str().c_str(), strlen(packet.str().c_str()), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "New unauthorized process was successfully sent to ", target);
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::RemoveUnauthorizedProc(std::string target, std::string proc)
 {
-  SPM_SOCKET sckt = 0;
   std::ostringstream packet;
+  struct sockaddr_in addr;
   
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-    packet << "RemoveUnauthorizedProc=" << proc;
-    send(sckt, packet.str().c_str(), strlen(packet.str().c_str()), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet.str().c_str(), strlen(packet.str().c_str()), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "New unauthorized process was successfully removed from ", target);
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::SndStopServer(std::string target)
 {
-  SPM_SOCKET sckt = 0;
   const char * packet = "stopServ";
+  struct sockaddr_in addr;
 
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-    send(sckt, packet, strlen(packet), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet, strlen(packet), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "Sent stop server");
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
 void SPM_SocketIO::SndResumeServer(std::string target)
 {
-  SPM_SOCKET sckt = 0;
   const char * packet = "resumeServ";
+  struct sockaddr_in addr;
  
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-    send(sckt, packet, strlen(packet), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet, strlen(packet), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "Sent clear logs");
-    CloseSPM_Socket(sckt);
   }
   else
   {
-    SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
+    SPM_LOG(SPMDebug::Err, "SPM Not Initialized !!!");
   }
 }
 
@@ -764,7 +704,7 @@ bool SPM_SocketIO::InternalPing(int count, int delay, std::string ip)
     delay = 1;
   }
 
-  if(sockInit(sckt, ip))
+  if(is_spm_init)
   {
     if(count == 0)
     {
@@ -799,19 +739,18 @@ bool SPM_SocketIO::InternalPing(int count, int delay, std::string ip)
 
 void SPM_SocketIO::SndKillServer(std::string target)
 {
-  SPM_SOCKET sckt = 0;
   const char * packet = "killServ";
+  struct sockaddr_in addr;
 
-  if(sockInit(sckt, target))
+  if(is_spm_init)
   {
-    send(sckt, packet, strlen(packet), 0);
+    addressSetup(&addr, target, globalConf.port);
+    sendto(main_socket, packet, strlen(packet), 0, (struct sockaddr*)&addr, sizeof(addr));
     SPM_LOG(SPMDebug::Success, "Sent kill server");
-    CloseSPM_Socket(sckt);
   }
   else
   {
     SPM_LOG(SPMDebug::Err, "Failed to initialize socket !!!");
-    CloseSPM_Socket(sckt);
   }
   
   // No more SPM stuff from here

@@ -23,6 +23,7 @@
 #endif
 
 inline char repl_buf[1024];
+inline SPM_SOCKET main_socket;
 
 class SPM_SocketIO
 {
@@ -58,11 +59,14 @@ class SPM_SocketIO
     Cacel
   };
   
+    static bool sockInit(SPM_SOCKET &s);
+    static void addressSetup(struct sockaddr_in *addr, std::string ip, int port);
+    static void CloseSPM_Socket(SPM_SOCKET s);
     static bool ping(int count, int delay, std::string ip);                       // [*] The basic ping
     static bool InternalPing(int count, int delay, std::string ip);               // [ ] Custom SPM ping. Returns true only if the SPM server is runing (In progress)
     static void SndPowerAction(SPM::server_actions at, std::string target);       // [*] Send power action to a device (Poweroff / reboot)
     static sysInfo GetSysInfo();                                                  // [ ] Retrieve system information of a specific device
-    static std::string GetServerReplyStr(int s);                                  // [ ] Get the curret replied message from the server
+    static std::string GetServerReplyStr(int s, struct sockaddr_in serv_addr);    // [ ] Get the curret replied message from the server
     static std::vector <sysInfo> GetSysInfoArr(std::vector<std::string> devices); // [ ] Retrieve system information from multiple devices into an aray
     static void PromptRespond(prompt_opts po);                                    // [ ] Send prompt response to a server
     static void ListActivePrompts(std::string target);                            // [ ] List unanswered prompts

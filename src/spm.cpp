@@ -55,6 +55,7 @@ void SPM::Init(SPMConfig::cfgStruct* settings_init)
   2) Check for configuration file. If not existing create it. (Here the default configuration structure is assigned)
   3) Check for availavble lists of computers or / servers
   4) Parse the lists
+  5) Initialize the main socket
   */
 
   SPMConfig::cfgStruct defaultConfig;
@@ -146,7 +147,7 @@ GOD DAMN
       defaultConfig.debug_log = false;
       defaultConfig.rescrict_time_span = 8;
       defaultConfig.port = DEFAULT_PORT;
-      defaultConfig.wol_port = 10;
+      defaultConfig.wol_port = 9;
       defaultConfig.user_feedback = false;
       defaultConfig.msgbox_log = true;
       defaultConfig.power_opts_callbacks = true;
@@ -190,6 +191,7 @@ GOD DAMN
 	{
 	  // Parse the main list
 	}
+	SPM_SocketIO::sockInit(main_socket);
 	is_spm_init = true;
 }
 
@@ -484,8 +486,8 @@ void SPM::UnloadEnv(int env_index)
 
 void SPM::Terminate()
 {
-  SPM_LOG(SPMDebug::Info, "Safe exiting SPM");
-  // This is where variables are freed, files closed and exit processes.
+  SPM_LOG(SPMDebug::Info, "Safe exiting SPM...");
+  SPM_SocketIO::CloseSPM_Socket(main_socket);
 }
 
 
