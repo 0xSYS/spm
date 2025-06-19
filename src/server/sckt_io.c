@@ -207,7 +207,7 @@ void StartScktReception()
   setsockopt(serv_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = INADDR_ANY;
-  addr.sin_port = htons(DEFAULT_PORT);
+  addr.sin_port = htons(current_conf.port);
 
   // Bind
   if(bind(serv_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)

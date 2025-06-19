@@ -67,12 +67,21 @@ unsigned short checksum(void *b, int len)
 bool SPM_SocketIO::sockInit(SPM_SOCKET &s)
 {
 #ifdef __linux__
+  int broadcast_enable = 1;
   s = socket(AF_INET, SOCK_DGRAM, 0);
   if(s < 0)
   {
     SPM_LOG(SPMDebug::Err, "Failed to create socket !!!");
     perror("socket");
     return false;
+    
+    if(setsockopt(s, SOL_SOCKET, SO_BROADCAST, &broadcast_enable, sizeof(broadcast_enable)) < 0)
+    {
+      SPM_LOG(SPMDebug::Err, "Failed to set socket options !!!");
+      perror("setsockopt (SO_BROADCAST) failed");
+      CloseSPM_Socket(s);
+      return false;
+    }
   }
   else
   {
@@ -110,6 +119,8 @@ void SPM_SocketIO::addressSetup(struct sockaddr_in *addr, std::string ip, int po
   memset(addr, 0, sizeof(*addr));
   addr->sin_family = AF_INET;
   addr->sin_port = htons(port);
+  
+  SPM_LOG(SPMDebug::Info, "Setup addres on port: ", port);
   
   int ret = inet_pton(AF_INET, ip.c_str(), &addr->sin_addr);
   if(ret <= 0)
